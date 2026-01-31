@@ -80,7 +80,7 @@ export const HeroSection = ({ onAnalyze }: HeroSectionProps) => {
           transition={{ delay: 0.4 }}
           className="text-xl md:text-2xl text-muted-foreground mb-12 font-light"
         >
-          We tell you where to show up.
+          We tell you where to show up to maximize impact on your life.
         </motion.p>
 
         {/* Form */}

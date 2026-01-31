@@ -122,9 +122,9 @@ export const ChatbotModal = ({ isOpen, onClose, onUpdateProfile }: ChatbotModalP
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed right-6 bottom-6 z-50 w-full max-w-md"
+            className="fixed z-50 inset-0 md:inset-auto md:right-6 md:bottom-6 md:w-full md:max-w-md"
           >
-            <div className="card-elevated rounded-2xl overflow-hidden shadow-2xl shadow-black/20 flex flex-col h-[600px]">
+            <div className="card-elevated md:rounded-2xl overflow-hidden shadow-2xl shadow-black/20 flex flex-col h-full md:h-[600px] safe-area-top safe-area-bottom">
               {/* Header */}
               <div className="p-4 border-b border-border flex items-center justify-between bg-card">
                 <div className="flex items-center gap-3">

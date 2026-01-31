@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ProfileSidebar } from "./ProfileSidebar";
 import { FocusCard, ImpactOpportunity } from "./FocusCard";
 import { CivicTodoList, TodoItem } from "./CivicTodoList";
 import { ChatbotModal } from "./ChatbotModal";
+import { BottomNav, MobileTab } from "../mobile/BottomNav";
 
 interface DashboardProps {
   userProfile: {
@@ -83,6 +84,7 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<MobileTab>("feed");
 
   const currentOpportunity = opportunities[currentIndex] ?? null;
 
@@ -127,14 +129,16 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Left Sidebar - Profile */}
-      <ProfileSidebar
-        userProfile={userProfile}
-        onEditProfile={() => setIsChatOpen(true)}
-      />
+      {/* Left Sidebar - Profile (hidden on mobile) */}
+      <div className="hidden md:block">
+        <ProfileSidebar
+          userProfile={userProfile}
+          onEditProfile={() => setIsChatOpen(true)}
+        />
+      </div>
 
-      {/* Center - Focus Feed */}
-      <main className="flex-1 flex items-center justify-center p-8">
+      {/* Center - Focus Feed (Desktop) */}
+      <main className="hidden md:flex flex-1 items-start justify-center p-8 pt-12">
         <FocusCard
           opportunity={currentOpportunity}
           onDismiss={handleDismiss}
@@ -142,8 +146,68 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
         />
       </main>
 
-      {/* Right Sidebar - To-Do List */}
-      <CivicTodoList items={todoItems} onToggle={handleToggleTodo} />
+      {/* Right Sidebar - To-Do List (hidden on mobile) */}
+      <div className="hidden md:block">
+        <CivicTodoList items={todoItems} onToggle={handleToggleTodo} />
+      </div>
+
+      {/* Mobile Content Area */}
+      <div className="md:hidden flex-1 pb-20">
+        <AnimatePresence mode="wait">
+          {mobileTab === "profile" && (
+            <motion.div
+              key="profile"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="min-h-screen"
+            >
+              <MobileProfileView
+                userProfile={userProfile}
+                onEditProfile={() => setIsChatOpen(true)}
+              />
+            </motion.div>
+          )}
+
+          {mobileTab === "feed" && (
+            <motion.div
+              key="feed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-start justify-center p-4 pt-6"
+            >
+              <FocusCard
+                opportunity={currentOpportunity}
+                onDismiss={handleDismiss}
+                onAccept={handleAccept}
+              />
+            </motion.div>
+          )}
+
+          {mobileTab === "actions" && (
+            <motion.div
+              key="actions"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              className="min-h-screen"
+            >
+              <MobileTodoView items={todoItems} onToggle={handleToggleTodo} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <BottomNav
+        activeTab={mobileTab}
+        onTabChange={setMobileTab}
+        todoCount={todoItems.filter(t => !t.completed).length}
+      />
 
       {/* Chatbot Modal */}
       <ChatbotModal
@@ -151,6 +215,228 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
         onClose={() => setIsChatOpen(false)}
         onUpdateProfile={handleProfileUpdate}
       />
+    </div>
+  );
+};
+
+// Mobile Profile View
+import {
+  MapPin,
+  Edit3,
+  Building2,
+  Train,
+  GraduationCap,
+  TrendingUp,
+  User,
+  Briefcase,
+  Calendar,
+  Gavel,
+  Car,
+  Home,
+  Baby,
+  Laptop,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface MobileProfileViewProps {
+  userProfile: {
+    drives: boolean;
+    owns: boolean;
+    hasChildren: boolean;
+  };
+  onEditProfile: () => void;
+}
+
+const MobileProfileView = ({ userProfile, onEditProfile }: MobileProfileViewProps) => {
+  return (
+    <div className="p-4 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-secondary/50 rounded-lg border border-border/50">
+            <Gavel className="w-5 h-5 text-primary" />
+          </div>
+          <h2 className="text-lg font-bold tracking-tight">
+            FULCRUM<span className="text-primary">.ai</span>
+          </h2>
+        </div>
+      </div>
+
+      {/* User Card */}
+      <div className="card-elevated p-5 rounded-xl">
+        <div className="flex items-start gap-4 mb-5">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <User className="w-7 h-7 text-primary-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-foreground">Alex Mercer</h3>
+            <p className="text-sm text-muted-foreground">32 years old</p>
+          </div>
+        </div>
+
+        {/* Micro CV */}
+        <div className="space-y-2.5 mb-5">
+          <CVItemMobile icon={MapPin} text="Mission District, SF" />
+          <CVItemMobile icon={Briefcase} text="Senior Engineer @ Stripe" />
+          <CVItemMobile icon={Calendar} text="SF Resident since 2018" />
+          {userProfile.drives && <CVItemMobile icon={Car} text="Drives daily" />}
+          {userProfile.owns ? (
+            <CVItemMobile icon={Home} text="Homeowner" />
+          ) : (
+            <CVItemMobile icon={Home} text="Renter" />
+          )}
+          {userProfile.hasChildren && <CVItemMobile icon={Baby} text="SFUSD Parent" />}
+          <CVItemMobile icon={Laptop} text="Tech Industry" />
+        </div>
+
+        <Button variant="outline" size="sm" className="w-full" onClick={onEditProfile}>
+          <Edit3 className="w-4 h-4 mr-2" />
+          Edit Profile
+        </Button>
+      </div>
+
+      {/* Issues */}
+      <div className="card-elevated p-4 rounded-xl">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+          Issues Affecting You
+        </h4>
+        <div className="space-y-2">
+          <ImpactItemMobile color="primary" text="Parking meter extension (Prop C)" />
+          <ImpactItemMobile color="accent" text="3 active zoning proposals nearby" />
+          {!userProfile.owns && <ImpactItemMobile color="warning" text="Rent Board hearing" />}
+          {userProfile.hasChildren && <ImpactItemMobile color="info" text="SFUSD arts funding cuts" />}
+        </div>
+      </div>
+
+      {/* Interests */}
+      <div className="card-elevated p-4 rounded-xl">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+          Detected Interests
+        </h4>
+        <div className="space-y-3">
+          <InterestBarMobile icon={Building2} label="Housing Policy" value={85} />
+          <InterestBarMobile icon={Train} label="Transit" value={72} />
+          {userProfile.hasChildren && <InterestBarMobile icon={GraduationCap} label="Education" value={90} />}
+          <InterestBarMobile icon={TrendingUp} label="Local Economy" value={45} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CVItemMobile = ({ icon: Icon, text }: { icon: React.ElementType; text: string }) => (
+  <div className="flex items-center gap-2.5 text-sm">
+    <Icon className="w-4 h-4 text-primary flex-shrink-0" />
+    <span className="text-muted-foreground">{text}</span>
+  </div>
+);
+
+const ImpactItemMobile = ({ color, text }: { color: string; text: string }) => {
+  const colorClasses: Record<string, string> = {
+    primary: "bg-primary",
+    accent: "bg-accent",
+    warning: "bg-warning",
+    info: "bg-info",
+  };
+  return (
+    <div className="flex items-start gap-2.5">
+      <div className={`w-1.5 h-1.5 rounded-full ${colorClasses[color]} mt-1.5`} />
+      <p className="text-sm text-muted-foreground">{text}</p>
+    </div>
+  );
+};
+
+const InterestBarMobile = ({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: number }) => (
+  <div className="flex items-center gap-3">
+    <Icon className="w-4 h-4 text-muted-foreground" />
+    <div className="flex-1">
+      <div className="flex justify-between mb-1">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="text-xs font-medium text-foreground">{value}%</span>
+      </div>
+      <div className="h-1 bg-secondary rounded-full overflow-hidden">
+        <div className="h-full bg-primary rounded-full" style={{ width: `${value}%` }} />
+      </div>
+    </div>
+  </div>
+);
+
+// Mobile Todo View
+import { CheckCircle2, Circle, Vote, Hand, ArrowRight as ArrowRightIcon } from "lucide-react";
+
+interface MobileTodoViewProps {
+  items: TodoItem[];
+  onToggle: (id: string) => void;
+}
+
+const MobileTodoView = ({ items, onToggle }: MobileTodoViewProps) => {
+  const typeConfig = {
+    vote: { icon: Vote, color: "text-primary" },
+    meeting: { icon: Hand, color: "text-accent" },
+    action: { icon: ArrowRightIcon, color: "text-warning" },
+  };
+
+  return (
+    <div className="p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold">Your Civic Actions</h2>
+        <span className="text-sm text-muted-foreground">
+          {items.filter(i => i.completed).length}/{items.length} done
+        </span>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="card-elevated p-8 rounded-xl text-center">
+          <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <p className="text-muted-foreground">No actions yet. Accept opportunities from the Feed!</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {items.map((item) => {
+            const config = typeConfig[item.type];
+            const Icon = config.icon;
+            return (
+              <motion.div
+                key={item.id}
+                layout
+                className={`card-elevated p-4 rounded-xl transition-opacity ${
+                  item.completed ? "opacity-60" : ""
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <button
+                    onClick={() => onToggle(item.id)}
+                    className="mt-0.5 transition-transform active:scale-90"
+                    aria-label={item.completed ? "Mark incomplete" : "Mark complete"}
+                  >
+                    {item.completed ? (
+                      <CheckCircle2 className="w-5 h-5 text-accent" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon className={`w-4 h-4 ${config.color}`} />
+                      <span className={`text-xs uppercase font-medium ${config.color}`}>
+                        {item.type}
+                      </span>
+                    </div>
+                    <p className={`text-sm ${item.completed ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                      {item.action}
+                    </p>
+                    {item.date && (
+                      <p className="text-xs text-muted-foreground mt-1">{item.date}</p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

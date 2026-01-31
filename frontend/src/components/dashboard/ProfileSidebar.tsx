@@ -10,6 +10,10 @@ import {
   Briefcase,
   Calendar,
   Gavel,
+  Car,
+  Home,
+  Baby,
+  Laptop,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -40,9 +44,9 @@ export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarPro
         </h2>
       </div>
 
-      {/* User Profile Card */}
+      {/* User Profile Card - Micro CV Style */}
       <div className="card-elevated p-5 rounded-xl mb-6">
-        <div className="flex items-start gap-4 mb-4">
+        <div className="flex items-start gap-4 mb-5">
           {/* Avatar */}
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
             <User className="w-7 h-7 text-primary-foreground" />
@@ -53,46 +57,19 @@ export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarPro
           </div>
         </div>
 
-        {/* Detailed Info */}
-        <div className="space-y-3 mb-4">
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">Mission District, SF (94110)</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Briefcase className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">Senior Software Engineer at Stripe</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">SF Resident since 2018</span>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {userProfile.drives && (
-            <span className="px-2 py-1 text-xs rounded-md bg-primary/10 text-primary border border-primary/20">
-              Driver
-            </span>
-          )}
+        {/* Micro CV - Bullet Points */}
+        <div className="space-y-2.5 mb-5">
+          <CVItem icon={MapPin} text="Mission District, SF (94110)" />
+          <CVItem icon={Briefcase} text="Senior Engineer @ Stripe" />
+          <CVItem icon={Calendar} text="SF Resident since 2018" />
+          {userProfile.drives && <CVItem icon={Car} text="Drives daily (Valencia St)" />}
           {userProfile.owns ? (
-            <span className="px-2 py-1 text-xs rounded-md bg-accent/10 text-accent border border-accent/20">
-              Homeowner
-            </span>
+            <CVItem icon={Home} text="Homeowner" color="accent" />
           ) : (
-            <span className="px-2 py-1 text-xs rounded-md bg-warning/10 text-warning border border-warning/20">
-              Renter
-            </span>
+            <CVItem icon={Home} text="Renter" color="warning" />
           )}
-          {userProfile.hasChildren && (
-            <span className="px-2 py-1 text-xs rounded-md bg-info/10 text-info border border-info/20">
-              SFUSD Parent
-            </span>
-          )}
-          <span className="px-2 py-1 text-xs rounded-md bg-secondary text-muted-foreground border border-border">
-            Tech Worker
-          </span>
+          {userProfile.hasChildren && <CVItem icon={Baby} text="SFUSD Parent" color="info" />}
+          <CVItem icon={Laptop} text="Tech Industry" />
         </div>
 
         <Button
@@ -106,43 +83,36 @@ export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarPro
         </Button>
       </div>
 
-      {/* Psychographic Profile */}
+      {/* Key Impacts - What affects you */}
       <div className="flex-1">
         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Civic Profile Analysis
+          Issues Affecting You
         </h4>
-        <div className="card-elevated p-4 rounded-xl mb-4">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            You are a <span className="text-foreground font-medium">tech-native {userProfile.owns ? "homeowner" : "renter"}</span> in
-            the Mission District with strong opinions on urban development.
-            Your LinkedIn activity suggests <span className="text-primary">high interest in YIMBY policies</span> and
-            transit-oriented development.
-            {userProfile.drives && (
-              <span className="text-warning"> Parking and transportation costs directly impact your daily commute on Valencia St.</span>
-            )}
-            {userProfile.hasChildren && (
-              <span className="text-info"> As an SFUSD parent, school funding and curriculum decisions affect your family directly.</span>
-            )}
-          </p>
-        </div>
-
-        {/* Key Insights */}
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Key Insights
-        </h4>
-        <div className="card-elevated p-4 rounded-xl space-y-2">
-          <div className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
-            <p className="text-xs text-muted-foreground">Likely impacted by Prop C parking meter extension</p>
-          </div>
-          <div className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5" />
-            <p className="text-xs text-muted-foreground">Your neighborhood has 3 active zoning proposals</p>
-          </div>
-          <div className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-warning mt-1.5" />
-            <p className="text-xs text-muted-foreground">Rent board hearing affects your building</p>
-          </div>
+        <div className="card-elevated p-4 rounded-xl space-y-2.5">
+          <ImpactItem
+            color="primary"
+            text="Parking meter extension (Prop C)"
+          />
+          <ImpactItem
+            color="accent"
+            text="3 active zoning proposals nearby"
+          />
+          {!userProfile.owns && (
+            <ImpactItem
+              color="warning"
+              text="Rent Board hearing for your building"
+            />
+          )}
+          {userProfile.hasChildren && (
+            <ImpactItem
+              color="info"
+              text="SFUSD arts funding cuts"
+            />
+          )}
+          <ImpactItem
+            color="muted"
+            text="16th St BART plaza redesign"
+          />
         </div>
       </div>
 
@@ -164,10 +134,54 @@ export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarPro
       {/* Footer */}
       <div className="mt-6 pt-6 border-t border-border">
         <p className="text-xs text-muted-foreground text-center">
-          Profile updated via Nyne.ai
+          Profile via Nyne.ai
         </p>
       </div>
     </motion.aside>
+  );
+};
+
+interface CVItemProps {
+  icon: React.ElementType;
+  text: string;
+  color?: "primary" | "accent" | "warning" | "info";
+}
+
+const CVItem = ({ icon: Icon, text, color }: CVItemProps) => {
+  const colorClasses = {
+    primary: "text-primary",
+    accent: "text-accent",
+    warning: "text-warning",
+    info: "text-info",
+  };
+
+  return (
+    <div className="flex items-center gap-2.5 text-sm">
+      <Icon className={`w-4 h-4 flex-shrink-0 ${color ? colorClasses[color] : "text-primary"}`} />
+      <span className="text-muted-foreground">{text}</span>
+    </div>
+  );
+};
+
+interface ImpactItemProps {
+  color: "primary" | "accent" | "warning" | "info" | "muted";
+  text: string;
+}
+
+const ImpactItem = ({ color, text }: ImpactItemProps) => {
+  const colorClasses = {
+    primary: "bg-primary",
+    accent: "bg-accent",
+    warning: "bg-warning",
+    info: "bg-info",
+    muted: "bg-muted-foreground",
+  };
+
+  return (
+    <div className="flex items-start gap-2.5">
+      <div className={`w-1.5 h-1.5 rounded-full ${colorClasses[color]} mt-1.5 flex-shrink-0`} />
+      <p className="text-sm text-muted-foreground">{text}</p>
+    </div>
   );
 };
 

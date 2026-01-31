@@ -100,8 +100,16 @@
   }
 
   .card-elevated {
-    @apply bg-card border border-border rounded-lg;
+    @apply bg-card border border-border rounded-lg transition-all duration-200;
     background: linear-gradient(135deg, hsl(240 4% 12%) 0%, hsl(240 4% 10%) 100%);
+  }
+
+  /* Card hover effects for desktop */
+  @media (hover: hover) {
+    .card-elevated:hover {
+      @apply shadow-xl border-border/80;
+      transform: translateY(-2px);
+    }
   }
 
   .scan-line {
@@ -124,12 +132,27 @@
     50% { transform: translateY(-10px); }
   }
 
+  /* Animated background gradient */
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
   .animate-pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
   .animate-float {
     animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
   }
 
   /* Amber accent utilities */
@@ -139,5 +162,57 @@
 
   .bg-amber-subtle {
     background-color: hsl(38 92% 50% / 0.1);
+  }
+
+  /* Safe area support for mobile */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Touch-friendly tap highlight */
+  @media (hover: none) {
+    button, a, [role="button"] {
+      -webkit-tap-highlight-color: hsl(38 92% 50% / 0.1);
+    }
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar for webkit browsers */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
   }
 }
