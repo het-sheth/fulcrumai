@@ -1,6 +1,7 @@
 /**
  * Fulcrum.ai API Client
  * Connects frontend to FastAPI backend
+ * Falls back to local JSON files when backend is unavailable
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -8,15 +9,15 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 // === Type Definitions (matching backend models) ===
 
 export interface SocialProfiles {
-  linkedin?: string;
-  twitter?: string;
-  github?: string;
-  facebook?: string;
-  instagram?: string;
-  strava?: string;
-  pinterest?: string;
-  flickr?: string;
-  other?: string[];
+  linkedin?: string | { url?: string; username?: string; [key: string]: unknown };
+  twitter?: string | { url?: string; username?: string; [key: string]: unknown };
+  github?: string | { url?: string; username?: string; [key: string]: unknown };
+  facebook?: string | { url?: string; username?: string; [key: string]: unknown };
+  instagram?: string | { url?: string; username?: string; [key: string]: unknown };
+  strava?: string | null;
+  pinterest?: string | null;
+  flickr?: string | null;
+  other?: Array<{ platform: string; url: string }>;
 }
 
 export interface WorkExperience {
@@ -42,30 +43,30 @@ export interface InferredProfile {
   full_name?: string;
   first_name?: string;
   last_name?: string;
-  email_verified?: string;
-  phone?: string;
-  profile_photo?: string;
+  email_verified?: string | null;
+  phone?: string | null;
+  profile_photo?: string | null;
   headline?: string;
   bio?: string;
-  birthday?: string;
+  birthday?: string | { year?: number; month?: number; day?: number };
 
   // Professional
   profession?: string;
-  company?: string;
-  company_domain?: string;
-  company_size?: string;
-  company_industry?: string;
-  industry?: string;
-  seniority?: string;
-  years_experience?: number;
+  company?: string | null;
+  company_domain?: string | null;
+  company_size?: string | null;
+  company_industry?: string | null;
+  industry?: string | null;
+  seniority?: string | null;
+  years_experience?: number | null;
 
   // Location
   likely_location?: string;
   city?: string;
   state?: string;
   country?: string;
-  timezone?: string;
-  address?: string;
+  timezone?: string | null;
+  address?: string | { city?: string; state?: string; country?: string };
 
   // Social
   social_profiles?: SocialProfiles;
@@ -81,7 +82,7 @@ export interface InferredProfile {
   interests?: string[];
 
   // Metadata
-  confidence_score?: number;
+  confidence_score?: number | null;
   data_source?: string;
 }
 
@@ -133,76 +134,136 @@ export interface DashboardResponse {
   match_explanation?: string;
 }
 
-// === API Functions ===
+// === Fallback Data Loaders ===
+
+/**
+ * Load fallback profile data from local JSON (Garry Tan's profile)
+ */
+async function loadFallbackProfile(): Promise<InferredProfile> {
+  const response = await fetch('/fallback-profile.json');
+  if (!response.ok) {
+    throw new Error('Failed to load fallback profile');
+  }
+  return response.json();
+}
+
+/**
+ * Load fallback civic events from local JSON (SF events)
+ */
+async function loadFallbackEvents(): Promise<DashboardResponse> {
+  const response = await fetch('/fallback-events.json');
+  if (!response.ok) {
+    throw new Error('Failed to load fallback events');
+  }
+  return response.json();
+}
+
+// === API Functions with Fallback ===
 
 /**
  * Enrich user profile from email/LinkedIn via Nyne.ai
- * Does NOT save user - call confirmProfile after user reviews
+ * Falls back to local JSON if backend unavailable
  */
 export async function onboard(email: string, linkedinUrl?: string): Promise<OnboardResponse> {
-  const response = await fetch(`${API_BASE_URL}/onboard`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email,
-      linkedin_url: linkedinUrl,
-    }),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/onboard`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        linkedin_url: linkedinUrl,
+      }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-    throw new Error(error.detail || 'Failed to onboard user');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.warn('Backend unavailable, using fallback profile data:', error);
+
+    // Load fallback profile (Garry Tan's data)
+    const fallbackProfile = await loadFallbackProfile();
+
+    return {
+      inferred: fallbackProfile,
+      questions_to_ask: [
+        "Do you own a car? (Affects parking/transit policy relevance)",
+        "Do you rent or own your home? (Affects housing policy relevance)",
+        "Do you have children under 18? (Affects education/family policy relevance)",
+      ],
+    };
   }
-
-  return response.json();
 }
 
 /**
  * Save confirmed user profile to database
- * Call after user reviews inferred data and answers questions
+ * Silently succeeds if backend unavailable (demo mode)
  */
 export async function confirmProfile(data: ConfirmProfileRequest): Promise<ConfirmProfileResponse> {
-  const response = await fetch(`${API_BASE_URL}/confirm-profile`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/confirm-profile`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-    throw new Error(error.detail || 'Failed to save profile');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.warn('Backend unavailable, skipping profile save (demo mode):', error);
+
+    // Return success for demo purposes
+    return {
+      success: true,
+      user_id: 'demo-user',
+      message: 'Profile saved (demo mode)',
+    };
   }
-
-  return response.json();
 }
 
 /**
  * Get personalized civic events for user dashboard
+ * Falls back to local JSON if backend unavailable
  */
 export async function getDashboard(email: string): Promise<DashboardResponse> {
-  const response = await fetch(`${API_BASE_URL}/dashboard/${encodeURIComponent(email)}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/dashboard/${encodeURIComponent(email)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-    throw new Error(error.detail || 'Failed to load dashboard');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.warn('Backend unavailable, using fallback civic events:', error);
+
+    // Load fallback events (SF civic events)
+    return loadFallbackEvents();
   }
-
-  return response.json();
 }
 
 /**
  * Health check for backend connectivity
  */
 export async function healthCheck(): Promise<{ status: string }> {
-  const response = await fetch(`${API_BASE_URL}/health`);
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`);
+    return response.json();
+  } catch {
+    return { status: 'unavailable - using fallback data' };
+  }
 }
