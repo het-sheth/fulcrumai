@@ -70,8 +70,10 @@ export const HeroSection = ({ onAnalyze }: HeroSectionProps) => {
         >
           <span className="text-foreground">Democracy is decided</span>
           <br />
-          <span className="text-foreground">by those who </span>
-          <span className="text-primary">show up.</span>
+          <span className="whitespace-nowrap">
+            <span className="text-foreground">by those who </span>
+            <span className="text-primary">show up.</span>
+          </span>
         </motion.h1>
 
         <motion.p
