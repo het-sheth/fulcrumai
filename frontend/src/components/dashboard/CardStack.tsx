@@ -7,6 +7,7 @@ import {
   X,
   MapPin,
   Calendar,
+  CalendarPlus,
   DollarSign,
   ArrowRight,
   ChevronDown,
@@ -18,6 +19,28 @@ import {
   Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Generate Google Calendar URL for an event
+const generateGoogleCalendarUrl = (opportunity: ImpactOpportunity): string => {
+  const title = encodeURIComponent(opportunity.title);
+  const details = encodeURIComponent(
+    `${opportunity.description}\n\nWhat to do: ${opportunity.recommendedAction || "Take action"}`
+  );
+  const location = encodeURIComponent(opportunity.location || "San Francisco, CA");
+
+  // Parse date string to create calendar event
+  // Default to tomorrow at 10 AM if no specific time
+  const now = new Date();
+  const eventDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Tomorrow
+  eventDate.setHours(10, 0, 0, 0);
+
+  // Format: YYYYMMDDTHHmmssZ
+  const formatDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const startDate = formatDate(eventDate);
+  const endDate = formatDate(new Date(eventDate.getTime() + 60 * 60 * 1000)); // 1 hour event
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startDate}/${endDate}`;
+};
 
 export interface ImpactOpportunity {
   id: string;
@@ -418,6 +441,18 @@ const FocusCardContent = ({
                   </div>
                 )}
               </div>
+              {/* Add to Calendar button - only show for meetings/votes with dates */}
+              {(opportunity.type === "meeting" || opportunity.type === "vote") && opportunity.date && (
+                <a
+                  href={generateGoogleCalendarUrl(opportunity)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
+                >
+                  <CalendarPlus className="w-4 h-4" />
+                  Add to Google Calendar
+                </a>
+              )}
               {opportunity.costImpact && (
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-warning/5 border border-warning/20">
                   <DollarSign className="w-5 h-5 text-warning" />

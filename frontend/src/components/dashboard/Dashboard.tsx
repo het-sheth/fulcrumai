@@ -49,38 +49,7 @@ const convertEventToOpportunity = (event: CivicEvent): ImpactOpportunity => {
 const generateOpportunities = (profile: VerificationAnswers): ImpactOpportunity[] => {
   const opportunities: ImpactOpportunity[] = [];
 
-  // SPONSORED ADS - Injected at top based on profile (high urgency for demo visibility)
-  if (profile.owns) {
-    // Homeowner ad - Solar tax credits
-    opportunities.push({
-      id: "sponsored-solar",
-      type: "action",
-      urgency: "urgent",
-      title: "Solar Tax Credit Extension Act",
-      description: "California's 30% solar tax credit expires December 31st. Installing solar now locks in maximum savings before the deadline.",
-      impactSummary: "Save $8K-15K on solar",
-      impact: "As a homeowner, you could save $8,000-$15,000 on solar installation costs. This tax credit won't be renewed at current levels.",
-      recommendedAction: "Get a free solar assessment and lock in your tax credit before the deadline. Takes 5 minutes online.",
-      date: "Credit expires December 31st",
-      costImpact: "Save $8,000-$15,000 with tax credits",
-      sponsoredBy: "SolarSF Coalition",
-    });
-  } else {
-    // Renter ad - Tenants union
-    opportunities.push({
-      id: "sponsored-tenants",
-      type: "action",
-      urgency: "urgent",
-      title: "Stop the Costa-Hawkins Loophole",
-      description: "A proposed amendment would allow landlords to reset rent to market rate after any renovation, even minor ones. This threatens rent control citywide.",
-      impactSummary: "Your rent could double",
-      impact: "As a renter, this loophole could let your landlord raise your rent by 50-100% after any renovation. Your housing stability is at risk.",
-      recommendedAction: "Sign the SF Tenants Union petition to close the loophole and protect rent control.",
-      date: "Petition deadline: This Friday",
-      sponsoredBy: "SF Tenants Union",
-    });
-  }
-
+  // REAL CIVIC OPPORTUNITIES FIRST (for demo video)
   if (profile.drives) {
     opportunities.push({
       id: "parking-1",
@@ -233,6 +202,38 @@ const generateOpportunities = (profile: VerificationAnswers): ImpactOpportunity[
     date: "Community Survey closes Friday",
   });
 
+  // SPONSORED ADS - Added at END for demo video (real civic content first)
+  if (profile.owns) {
+    // Homeowner ad - Solar tax credits
+    opportunities.push({
+      id: "sponsored-solar",
+      type: "action",
+      urgency: "urgent",
+      title: "Solar Tax Credit Extension Act",
+      description: "California's 30% solar tax credit expires December 31st. Installing solar now locks in maximum savings before the deadline.",
+      impactSummary: "Save $8K-15K on solar",
+      impact: "As a homeowner, you could save $8,000-$15,000 on solar installation costs. This tax credit won't be renewed at current levels.",
+      recommendedAction: "Get a free solar assessment and lock in your tax credit before the deadline. Takes 5 minutes online.",
+      date: "Credit expires December 31st",
+      costImpact: "Save $8,000-$15,000 with tax credits",
+      sponsoredBy: "SolarSF Coalition",
+    });
+  } else {
+    // Renter ad - Tenants union
+    opportunities.push({
+      id: "sponsored-tenants",
+      type: "action",
+      urgency: "urgent",
+      title: "Stop the Costa-Hawkins Loophole",
+      description: "A proposed amendment would allow landlords to reset rent to market rate after any renovation, even minor ones. This threatens rent control citywide.",
+      impactSummary: "Your rent could double",
+      impact: "As a renter, this loophole could let your landlord raise your rent by 50-100% after any renovation. Your housing stability is at risk.",
+      recommendedAction: "Sign the SF Tenants Union petition to close the loophole and protect rent control.",
+      date: "Petition deadline: This Friday",
+      sponsoredBy: "SF Tenants Union",
+    });
+  }
+
   return opportunities;
 };
 
@@ -261,12 +262,13 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
           // Convert API events to opportunities and merge with sponsored content
           const apiOpportunities = response.events.map(convertEventToOpportunity);
 
-          // Keep sponsored ads from generateOpportunities, add real events
+          // Keep sponsored ads from generateOpportunities, but show AFTER real events for demo
           const sponsoredAds = generateOpportunities(userProfile).filter(
             (o) => o.sponsoredBy
           );
 
-          setOpportunities([...sponsoredAds, ...apiOpportunities]);
+          // Real civic events first, then sponsored ads (better for demo video)
+          setOpportunities([...apiOpportunities, ...sponsoredAds]);
         }
       } catch (error) {
         console.error("Failed to fetch dashboard events:", error);
