@@ -25,7 +25,8 @@ export interface ImpactOpportunity {
   urgency: "urgent" | "soon" | "upcoming";
   title: string;
   description: string;
-  impact: string;
+  impactSummary: string; // Short 3-6 word headline (bold)
+  impact: string; // Longer explanation (subtext)
   location?: string;
   date?: string;
   costImpact?: string;
@@ -345,9 +346,14 @@ const FocusCardContent = ({
             <X className="w-5 h-5" />
           </button>
         </div>
-        <h2 className="text-xl font-bold text-foreground leading-snug">
-          {opportunity.impact}
+        {/* Impact Summary - Bold headline */}
+        <h2 className="text-xl font-bold text-foreground leading-snug mb-2">
+          {opportunity.impactSummary}
         </h2>
+        {/* Impact Details - Subtext */}
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {opportunity.impact}
+        </p>
       </div>
 
       {/* What To Do */}
