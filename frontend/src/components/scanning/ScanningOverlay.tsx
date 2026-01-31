@@ -133,7 +133,7 @@ export const ScanningOverlay = ({ onComplete }: ScanningOverlayProps) => {
               FULCRUM<span className="text-primary">.ai</span>
             </h2>
           </div>
-          <p className="text-sm text-muted-foreground">Powered by Nyne.ai Identity Layer</p>
+          <p className="text-sm text-muted-foreground">Powered by Nyne.ai · A South Park Commons Company</p>
         </motion.div>
 
         {/* Nyne.ai Explanation Card */}
@@ -147,6 +147,7 @@ export const ScanningOverlay = ({ onComplete }: ScanningOverlayProps) => {
             <Shield className="w-5 h-5 text-primary" />
             <span className="text-sm font-medium text-primary">Nyne.ai Identity Engine</span>
           </div>
+          <p className="text-xs text-muted-foreground/70 mb-2">South Park Commons Company</p>
           <p className="text-sm text-muted-foreground leading-relaxed mb-4">
             Nyne.ai securely analyzes your public digital footprint across social platforms
             to understand your interests, values, and community connections. This helps us

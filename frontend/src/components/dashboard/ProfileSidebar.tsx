@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin,
   Edit3,
@@ -14,6 +15,14 @@ import {
   Home,
   Baby,
   Laptop,
+  ChevronDown,
+  ChevronUp,
+  Leaf,
+  ShieldCheck,
+  Heart,
+  Users,
+  Megaphone,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -26,13 +35,32 @@ interface ProfileSidebarProps {
   onEditProfile: () => void;
 }
 
+// Detected values/insights from social analysis (simulated from X/Twitter, LinkedIn)
+const detectedValues = [
+  { icon: Leaf, label: "Climate Action", description: "Frequently engages with climate content, follows @CACleanEnergy", strength: "strong" },
+  { icon: ShieldCheck, label: "Safe Streets", description: "Shared Vision Zero posts, commented on SFMTA bike lane discussions", strength: "strong" },
+  { icon: Users, label: "Community Building", description: "Active in Mission District neighborhood groups", strength: "moderate" },
+  { icon: Heart, label: "Arts & Culture", description: "Follows local galleries, liked SFMOMA posts", strength: "moderate" },
+  { icon: Megaphone, label: "Worker Rights", description: "Retweeted labor organizing content", strength: "moderate" },
+];
+
+const socialInsights = [
+  "Posted about housing affordability crisis (3 times this month)",
+  "Engaged with BART delay complaints (transit reliability matters)",
+  "Liked posts about restaurant closures in Mission District",
+  "Shared article about tech industry's role in local politics",
+  "Commented on Valencia bike lane debate",
+];
+
 export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarProps) => {
+  const [showMoreValues, setShowMoreValues] = useState(false);
+
   return (
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-80 min-h-screen bg-sidebar border-r border-sidebar-border p-6 flex flex-col"
+      className="w-80 min-h-screen bg-sidebar border-r border-sidebar-border p-6 flex flex-col overflow-y-auto"
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
@@ -83,50 +111,81 @@ export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarPro
         </Button>
       </div>
 
-      {/* Key Impacts - What affects you */}
-      <div className="flex-1">
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Issues Affecting You
-        </h4>
-        <div className="card-elevated p-4 rounded-xl space-y-2.5">
-          <ImpactItem
-            color="primary"
-            text="Parking meter extension (Prop C)"
-          />
-          <ImpactItem
-            color="accent"
-            text="3 active zoning proposals nearby"
-          />
-          {!userProfile.owns && (
-            <ImpactItem
-              color="warning"
-              text="Rent Board hearing for your building"
-            />
-          )}
-          {userProfile.hasChildren && (
-            <ImpactItem
-              color="info"
-              text="SFUSD arts funding cuts"
-            />
-          )}
-          <ImpactItem
-            color="muted"
-            text="16th St BART plaza redesign"
-          />
+      {/* Values & Priorities - Detected from Social */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Your Values
+          </h4>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground/60">
+            <Sparkles className="w-3 h-3" />
+            <span>via Nyne.ai</span>
+          </div>
+        </div>
+
+        <div className="card-elevated p-4 rounded-xl space-y-3">
+          {/* Always show first 2 values */}
+          {detectedValues.slice(0, 2).map((value) => (
+            <ValueItem key={value.label} {...value} />
+          ))}
+
+          {/* Expandable values */}
+          <AnimatePresence>
+            {showMoreValues && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-3 overflow-hidden"
+              >
+                {detectedValues.slice(2).map((value) => (
+                  <ValueItem key={value.label} {...value} />
+                ))}
+
+                {/* Social insights when expanded */}
+                <div className="pt-3 mt-3 border-t border-border">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">
+                    Recent Social Activity
+                  </p>
+                  <div className="space-y-1.5">
+                    {socialInsights.map((insight, i) => (
+                      <p key={i} className="text-xs text-muted-foreground/70 leading-relaxed">
+                        • {insight}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <button
+            onClick={() => setShowMoreValues(!showMoreValues)}
+            className="w-full pt-2 flex items-center justify-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
+          >
+            {showMoreValues ? (
+              <>Show less <ChevronUp className="w-3 h-3" /></>
+            ) : (
+              <>Show more insights <ChevronDown className="w-3 h-3" /></>
+            )}
+          </button>
         </div>
       </div>
 
       {/* Interest indicators */}
-      <div className="mt-6">
+      <div className="flex-1">
         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Detected Interests
+          Policy Interest Scores
         </h4>
         <div className="space-y-2">
           <InterestBar icon={Building2} label="Housing Policy" value={85} color="primary" />
           <InterestBar icon={Train} label="Transit" value={72} color="accent" />
+          <InterestBar icon={Leaf} label="Climate/Environment" value={78} color="accent" />
           {userProfile.hasChildren && (
             <InterestBar icon={GraduationCap} label="Education" value={90} color="info" />
           )}
+          <InterestBar icon={ShieldCheck} label="Public Safety" value={65} color="warning" />
           <InterestBar icon={TrendingUp} label="Local Economy" value={45} color="warning" />
         </div>
       </div>
@@ -135,6 +194,9 @@ export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarPro
       <div className="mt-6 pt-6 border-t border-border">
         <p className="text-xs text-muted-foreground text-center">
           Profile via Nyne.ai
+        </p>
+        <p className="text-xs text-muted-foreground/60 text-center mt-1">
+          A South Park Commons Company
         </p>
       </div>
     </motion.aside>
@@ -163,24 +225,36 @@ const CVItem = ({ icon: Icon, text, color }: CVItemProps) => {
   );
 };
 
-interface ImpactItemProps {
-  color: "primary" | "accent" | "warning" | "info" | "muted";
-  text: string;
+interface ValueItemProps {
+  icon: React.ElementType;
+  label: string;
+  description: string;
+  strength: "strong" | "moderate";
 }
 
-const ImpactItem = ({ color, text }: ImpactItemProps) => {
-  const colorClasses = {
-    primary: "bg-primary",
-    accent: "bg-accent",
-    warning: "bg-warning",
-    info: "bg-info",
-    muted: "bg-muted-foreground",
-  };
-
+const ValueItem = ({ icon: Icon, label, description, strength }: ValueItemProps) => {
   return (
-    <div className="flex items-start gap-2.5">
-      <div className={`w-1.5 h-1.5 rounded-full ${colorClasses[color]} mt-1.5 flex-shrink-0`} />
-      <p className="text-sm text-muted-foreground">{text}</p>
+    <div className="flex items-start gap-3">
+      <div className={`p-1.5 rounded-lg ${
+        strength === "strong" ? "bg-primary/10" : "bg-secondary"
+      }`}>
+        <Icon className={`w-3.5 h-3.5 ${
+          strength === "strong" ? "text-primary" : "text-muted-foreground"
+        }`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-foreground">{label}</span>
+          {strength === "strong" && (
+            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded">
+              Strong
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground/70 leading-relaxed mt-0.5">
+          {description}
+        </p>
+      </div>
     </div>
   );
 };

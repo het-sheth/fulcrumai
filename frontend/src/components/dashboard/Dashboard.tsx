@@ -16,6 +16,36 @@ interface DashboardProps {
 const generateOpportunities = (profile: VerificationAnswers): ImpactOpportunity[] => {
   const opportunities: ImpactOpportunity[] = [];
 
+  // SPONSORED ADS - Injected at top based on profile (high urgency for demo visibility)
+  if (profile.owns) {
+    // Homeowner ad - Solar tax credits
+    opportunities.push({
+      id: "sponsored-solar",
+      type: "action",
+      urgency: "urgent",
+      title: "Solar Tax Credit Extension Act",
+      description: "California's 30% solar tax credit expires December 31st. Installing solar now locks in maximum savings before the deadline.",
+      impact: "As a homeowner, you could save $8,000-$15,000 on solar installation costs. This tax credit won't be renewed at current levels.",
+      recommendedAction: "Get a free solar assessment and lock in your tax credit before the deadline. Takes 5 minutes online.",
+      date: "Credit expires December 31st",
+      costImpact: "Save $8,000-$15,000 with tax credits",
+      sponsoredBy: "SolarSF Coalition",
+    });
+  } else {
+    // Renter ad - Tenants union
+    opportunities.push({
+      id: "sponsored-tenants",
+      type: "action",
+      urgency: "urgent",
+      title: "Stop the Costa-Hawkins Loophole",
+      description: "A proposed amendment would allow landlords to reset rent to market rate after any renovation, even minor ones. This threatens rent control citywide.",
+      impact: "As a renter, this loophole could let your landlord raise your rent by 50-100% after any renovation. Your housing stability is at risk.",
+      recommendedAction: "Sign the SF Tenants Union petition to close the loophole and protect rent control.",
+      date: "Petition deadline: This Friday",
+      sponsoredBy: "SF Tenants Union",
+    });
+  }
+
   if (profile.drives) {
     opportunities.push({
       id: "parking-1",

@@ -14,6 +14,8 @@ import {
   Vote,
   RotateCcw,
   List,
+  Megaphone,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -28,6 +30,7 @@ export interface ImpactOpportunity {
   date?: string;
   costImpact?: string;
   recommendedAction?: string;
+  sponsoredBy?: string; // Organization sponsoring this promoted action
 }
 
 interface ReviewedCard {
@@ -146,6 +149,9 @@ export const CardStack = ({ opportunities, onAccept, onComplete }: CardStackProp
                       }`}>
                         {item.action}
                       </span>
+                      {item.opportunity.sponsoredBy && (
+                        <span className="text-xs text-muted-foreground">· Promoted</span>
+                      )}
                     </div>
                     <p className="text-sm font-medium text-foreground line-clamp-2">
                       {item.opportunity.title}
@@ -266,7 +272,7 @@ export const CardStack = ({ opportunities, onAccept, onComplete }: CardStackProp
   );
 };
 
-// Card content component (extracted from FocusCard)
+// Card content component
 interface FocusCardContentProps {
   opportunity: ImpactOpportunity;
   onDismiss: () => void;
@@ -282,6 +288,8 @@ const FocusCardContent = ({
   showMore,
   onToggleMore,
 }: FocusCardContentProps) => {
+  const isSponsored = !!opportunity.sponsoredBy;
+
   const urgencyConfig = {
     urgent: {
       badge: "URGENT",
@@ -305,6 +313,23 @@ const FocusCardContent = ({
 
   return (
     <div className="card-elevated rounded-2xl overflow-hidden">
+      {/* Sponsored Banner */}
+      {isSponsored && (
+        <div className="px-5 py-2.5 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-b border-violet-500/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Megaphone className="w-4 h-4 text-violet-400" />
+              <span className="text-xs font-medium text-violet-400 uppercase tracking-wider">
+                Promoted Action
+              </span>
+            </div>
+            <span className="text-xs text-violet-300/70">
+              Paid for by {opportunity.sponsoredBy}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="p-5 pb-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
@@ -405,9 +430,23 @@ const FocusCardContent = ({
         <Button variant="outline" size="lg" className="flex-1" onClick={onDismiss}>
           Skip
         </Button>
-        <Button variant="success" size="lg" className="flex-1 group" onClick={onAccept}>
-          I'll Do This
-          <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+        <Button
+          variant={isSponsored ? "hero" : "success"}
+          size="lg"
+          className="flex-1 group"
+          onClick={onAccept}
+        >
+          {isSponsored ? (
+            <>
+              <Heart className="w-5 h-5 mr-2" />
+              Support This
+            </>
+          ) : (
+            <>
+              I'll Do This
+              <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </Button>
       </div>
     </div>
