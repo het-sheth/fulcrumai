@@ -2,8 +2,8 @@
 POST /confirm-profile - Save confirmed user profile
 """
 from fastapi import APIRouter, HTTPException
-from ..models import ConfirmProfileRequest, ConfirmProfileResponse
-from ..services.supabase_client import create_or_update_user
+from models import ConfirmProfileRequest, ConfirmProfileResponse
+from services.supabase_client import create_or_update_user
 
 router = APIRouter()
 

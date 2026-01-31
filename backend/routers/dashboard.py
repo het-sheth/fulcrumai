@@ -2,8 +2,8 @@
 GET /dashboard/{email} - Get personalized civic events for user
 """
 from fastapi import APIRouter, HTTPException
-from ..models import DashboardResponse, UserProfile, CivicEvent
-from ..services.supabase_client import get_user_by_email, get_events_by_tags, get_all_events
+from models import DashboardResponse, UserProfile, CivicEvent
+from services.supabase_client import get_user_by_email, get_events_by_tags, get_all_events
 
 router = APIRouter()
 

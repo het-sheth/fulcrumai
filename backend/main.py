@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-from .routers import onboard, profile, dashboard, hyperspell, admin
+from routers import onboard, profile, dashboard, hyperspell, admin
 
 app = FastAPI(
     title="Fulcrum.ai",
@@ -39,14 +39,21 @@ app.include_router(admin.router)
 async def root():
     return {
         "name": "Fulcrum.ai",
-        "version": "0.1.0",
-        "description": "Civic engagement API for SF citizens",
+        "version": "0.2.0",
+        "description": "Civic engagement API for SF citizens - Match users with relevant legislation",
         "endpoints": {
-            "POST /onboard": "Enrich user profile from email/LinkedIn",
-            "POST /confirm-profile": "Save confirmed user profile",
-            "GET /dashboard/{email}": "Get personalized civic events",
+            "POST /onboard": "Enrich user profile from email/LinkedIn and save to database",
+            "POST /enrich": "Alias for /onboard",
+            "GET /user/{email}": "Get user profile with inferred data",
+            "POST /confirm-profile": "Update user profile with confirmed data",
+            "GET /dashboard/{email}": "Get personalized civic events matched to user interests",
             "POST /admin/refresh-events": "Fetch latest civic data from Legistar",
             "GET /admin/events-stats": "Get civic events statistics"
+        },
+        "usage": {
+            "step1": "POST /onboard with {email, linkedin_url} - Creates user with Nyne enrichment",
+            "step2": "POST /confirm-profile with {email, zip_code, has_car, has_kids} - Updates user preferences",
+            "step3": "GET /dashboard/{email} - Returns matched civic events"
         }
     }
 

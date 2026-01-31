@@ -36,9 +36,8 @@ from services.llm_enrichment import generate_quick_interests, generate_civic_pro
 
 
 # Test data
-TEST_EMAIL = "shethhet2004@gmail.com"
-TEST_LINKEDIN = "https://www.linkedin.com/in/hethirensheth/"
-
+TEST_EMAIL = ""
+TEST_LINKEDIN = "https://www.linkedin.com/in/garrytan/"
 
 @pytest.mark.asyncio
 async def test_nyne_enrichment_real():

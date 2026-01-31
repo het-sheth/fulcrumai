@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
 from hyperspell import Hyperspell
 
-from ..config import HYPERSPELL_API_KEY
+from config import HYPERSPELL_API_KEY
 
 router = APIRouter(prefix="/hyperspell")
 
