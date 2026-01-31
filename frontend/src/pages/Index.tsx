@@ -2,17 +2,14 @@ import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ScanningOverlay } from "@/components/scanning/ScanningOverlay";
-import { VerificationCards } from "@/components/verification/VerificationCards";
+import { VerificationCards, VerificationAnswers } from "@/components/verification/VerificationCards";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 
 type AppState = "landing" | "scanning" | "verification" | "dashboard";
 
-interface UserProfile {
+export interface UserProfile extends VerificationAnswers {
   email: string;
   linkedin: string;
-  drives: boolean;
-  owns: boolean;
-  hasChildren: boolean;
 }
 
 const Index = () => {
@@ -23,6 +20,11 @@ const Index = () => {
     drives: false,
     owns: false,
     hasChildren: false,
+    usesTransit: false,
+    bikeCommutes: false,
+    isSmallBusinessOwner: false,
+    concernedAboutSafety: false,
+    usesParks: false,
   });
 
   const handleAnalyze = (email: string, linkedin: string) => {
@@ -34,12 +36,12 @@ const Index = () => {
     setAppState("verification");
   };
 
-  const handleVerificationComplete = (answers: { drives: boolean; owns: boolean; hasChildren: boolean }) => {
+  const handleVerificationComplete = (answers: VerificationAnswers) => {
     setUserProfile((prev) => ({ ...prev, ...answers }));
     setAppState("dashboard");
   };
 
-  const handleUpdateProfile = (updates: Partial<{ drives: boolean; owns: boolean; hasChildren: boolean }>) => {
+  const handleUpdateProfile = (updates: Partial<VerificationAnswers>) => {
     setUserProfile((prev) => ({ ...prev, ...updates }));
   };
 
@@ -61,11 +63,7 @@ const Index = () => {
         {appState === "dashboard" && (
           <Dashboard
             key="dashboard"
-            userProfile={{
-              drives: userProfile.drives,
-              owns: userProfile.owns,
-              hasChildren: userProfile.hasChildren,
-            }}
+            userProfile={userProfile}
             onUpdateProfile={handleUpdateProfile}
           />
         )}

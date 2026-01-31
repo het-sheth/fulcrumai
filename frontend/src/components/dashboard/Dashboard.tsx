@@ -1,22 +1,19 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProfileSidebar } from "./ProfileSidebar";
-import { FocusCard, ImpactOpportunity } from "./FocusCard";
+import { CardStack, ImpactOpportunity } from "./CardStack";
 import { CivicTodoList, TodoItem } from "./CivicTodoList";
 import { ChatbotModal } from "./ChatbotModal";
 import { BottomNav, MobileTab } from "../mobile/BottomNav";
+import { VerificationAnswers } from "../verification/VerificationCards";
 
 interface DashboardProps {
-  userProfile: {
-    drives: boolean;
-    owns: boolean;
-    hasChildren: boolean;
-  };
-  onUpdateProfile: (updates: Partial<{ drives: boolean; owns: boolean; hasChildren: boolean }>) => void;
+  userProfile: VerificationAnswers;
+  onUpdateProfile: (updates: Partial<VerificationAnswers>) => void;
 }
 
-// Mock data for opportunities with recommended actions
-const generateOpportunities = (profile: { drives: boolean; owns: boolean; hasChildren: boolean }): ImpactOpportunity[] => {
+// Generate opportunities based on full profile
+const generateOpportunities = (profile: VerificationAnswers): ImpactOpportunity[] => {
   const opportunities: ImpactOpportunity[] = [];
 
   if (profile.drives) {
@@ -25,12 +22,41 @@ const generateOpportunities = (profile: { drives: boolean; owns: boolean; hasChi
       type: "vote",
       urgency: "urgent",
       title: "Parking Meter Extension Prop C",
-      description: "This proposition would extend parking meter hours from 6pm to 10pm in commercial districts across San Francisco, affecting your daily parking routine.",
-      impact: "Because you drive and live in the Mission, this will cost you an estimated ~$400/year in additional parking fees. Your usual spots on Valencia and 16th will be affected.",
-      recommendedAction: "Show up at City Hall on November 5th and vote NO on Prop C to keep current parking meter hours.",
+      description: "This proposition would extend parking meter hours from 6pm to 10pm in commercial districts across San Francisco.",
+      impact: "As a driver, this will cost you ~$400/year in additional parking fees. Your usual spots on Valencia and 16th will be affected.",
+      recommendedAction: "Vote NO on Prop C at City Hall on November 5th to keep current parking meter hours.",
       location: "City Hall, Polling Station #24",
       date: "November 5th, 7am - 8pm",
       costImpact: "~$400/year additional cost",
+    });
+  }
+
+  if (profile.usesTransit) {
+    opportunities.push({
+      id: "transit-fare",
+      type: "meeting",
+      urgency: "soon",
+      title: "SFMTA Fare Increase Proposal",
+      description: "SFMTA is proposing a $0.50 fare increase for Muni and BART connections to address budget shortfalls.",
+      impact: "As a regular transit user, this would add ~$260/year to your commute costs based on typical usage.",
+      recommendedAction: "Attend the SFMTA board meeting and voice your opinion during public comment.",
+      location: "SFMTA HQ, 1 South Van Ness",
+      date: "Wednesday, 10:00 AM",
+      costImpact: "~$260/year fare increase",
+    });
+  }
+
+  if (profile.bikeCommutes) {
+    opportunities.push({
+      id: "bike-lane",
+      type: "action",
+      urgency: "upcoming",
+      title: "Valencia Street Protected Bike Lane",
+      description: "SFMTA is deciding whether to make the Valencia Street protected bike lane permanent or remove it.",
+      impact: "This directly affects your daily bike commute safety. The protected lane has reduced bike injuries by 40%.",
+      recommendedAction: "Submit your support for the permanent protected lane via the online survey by Friday.",
+      location: "Valencia Street (16th to Cesar Chavez)",
+      date: "Survey closes Friday",
     });
   }
 
@@ -40,11 +66,26 @@ const generateOpportunities = (profile: { drives: boolean; owns: boolean; hasChi
       type: "meeting",
       urgency: "soon",
       title: "Rent Control Board Hearing",
-      description: "The Rent Board is reviewing new guidelines for annual rent increases. This directly affects the maximum amount your landlord can raise your rent next year.",
-      impact: "As a renter in the Mission District, proposed changes could increase your maximum annual rent by 1.5% more than current limits. For your unit, that's approximately $75/month.",
-      recommendedAction: "Attend the hearing on Tuesday at 2pm. Raise your hand during public comment and state you oppose the proposed increase.",
+      description: "The Rent Board is reviewing new guidelines for annual rent increases affecting rent-controlled units.",
+      impact: "As a renter, proposed changes could increase your maximum annual rent by 1.5% more than current limits (~$75/month).",
+      recommendedAction: "Attend the hearing on Tuesday at 2pm and state you oppose the proposed increase.",
       location: "25 Van Ness Ave, Room 400",
       date: "Tuesday, 2:00 PM",
+    });
+  }
+
+  if (profile.owns) {
+    opportunities.push({
+      id: "prop-tax",
+      type: "vote",
+      urgency: "upcoming",
+      title: "Prop D: School Bond Property Tax",
+      description: "A new bond measure to fund SFUSD school repairs, adding approximately $200/year to property taxes.",
+      impact: "As a homeowner, this will increase your property tax by ~$200/year to fund school facility improvements.",
+      recommendedAction: "Research the bond details and vote on November 5th based on your priorities.",
+      location: "Your local polling station",
+      date: "November 5th",
+      costImpact: "~$200/year property tax increase",
     });
   }
 
@@ -54,22 +95,65 @@ const generateOpportunities = (profile: { drives: boolean; owns: boolean; hasChi
       type: "meeting",
       urgency: "upcoming",
       title: "SFUSD Budget Allocation Meeting",
-      description: "The school board will discuss the upcoming year's budget priorities. Art and music programs at Mission District schools are on the chopping block.",
-      impact: "Your child's school (Cesar Chavez Elementary) is slated for a 15% cut to arts programs. This affects the after-school programs your family relies on.",
-      recommendedAction: "Attend the board meeting Thursday at 6pm. Sign up for public comment and advocate for maintaining arts funding at Cesar Chavez Elementary.",
+      description: "The school board will discuss budget priorities. Art and music programs at several schools are on the chopping block.",
+      impact: "Your child's school may face a 15% cut to arts programs, affecting after-school activities.",
+      recommendedAction: "Attend the board meeting Thursday at 6pm and advocate for maintaining arts funding.",
       location: "SFUSD Headquarters, Board Room",
       date: "Next Thursday, 6:00 PM",
     });
   }
 
+  if (profile.isSmallBusinessOwner) {
+    opportunities.push({
+      id: "biz-license",
+      type: "action",
+      urgency: "soon",
+      title: "Small Business License Fee Increase",
+      description: "The city is proposing to increase annual business license fees by 25% for small businesses.",
+      impact: "As a small business owner, this would increase your annual licensing costs by several hundred dollars.",
+      recommendedAction: "Sign the Small Business Coalition petition opposing the fee increase.",
+      date: "Petition deadline: Next Monday",
+      costImpact: "25% license fee increase",
+    });
+  }
+
+  if (profile.concernedAboutSafety) {
+    opportunities.push({
+      id: "safety-1",
+      type: "meeting",
+      urgency: "upcoming",
+      title: "Police Commission Community Meeting",
+      description: "The Police Commission is gathering community input on patrol priorities for your district.",
+      impact: "This is your chance to directly influence where police resources are allocated in your neighborhood.",
+      recommendedAction: "Attend the community meeting and share your safety concerns and priorities.",
+      location: "Mission Cultural Center, 2868 Mission St",
+      date: "Next Wednesday, 7:00 PM",
+    });
+  }
+
+  if (profile.usesParks) {
+    opportunities.push({
+      id: "parks-1",
+      type: "action",
+      urgency: "upcoming",
+      title: "Dolores Park Renovation Proposal",
+      description: "SF Rec & Parks is seeking input on renovations including new restrooms, playground equipment, and dog areas.",
+      impact: "As a park user, you can influence what amenities are prioritized in the renovation budget.",
+      recommendedAction: "Complete the community survey to share your priorities for park improvements.",
+      location: "Dolores Park",
+      date: "Survey closes in 2 weeks",
+    });
+  }
+
+  // Always include a general civic opportunity
   opportunities.push({
-    id: "transit-1",
+    id: "transit-plaza",
     type: "action",
     urgency: "upcoming",
     title: "16th Street BART Plaza Redesign",
-    description: "SFMTA is seeking community input on the redesign of the 16th Street BART plaza. This is your chance to shape how this space serves the Mission community.",
-    impact: "This is your local transit hub that you use daily. Your input on safety improvements, lighting, and vendor space will directly influence the final design.",
-    recommendedAction: "Complete the online survey by Friday. Focus on requesting better lighting and more seating near the Valencia St entrance.",
+    description: "SFMTA is seeking community input on the redesign of the 16th Street BART plaza.",
+    impact: "Your input on safety improvements, lighting, and vendor space will directly influence the final design.",
+    recommendedAction: "Complete the online survey by Friday. Focus on what matters most to you.",
     location: "16th Street BART Station",
     date: "Community Survey closes Friday",
   });
@@ -78,37 +162,28 @@ const generateOpportunities = (profile: { drives: boolean; owns: boolean; hasChi
 };
 
 export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
-  const [opportunities, setOpportunities] = useState<ImpactOpportunity[]>(() =>
+  const [opportunities] = useState<ImpactOpportunity[]>(() =>
     generateOpportunities(userProfile)
   );
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>("feed");
+  const [isComplete, setIsComplete] = useState(false);
 
-  const currentOpportunity = opportunities[currentIndex] ?? null;
-
-  const handleDismiss = () => {
-    if (currentIndex < opportunities.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setCurrentIndex(opportunities.length); // Show "all caught up"
-    }
+  const handleAcceptOpportunity = (opportunity: ImpactOpportunity) => {
+    const newTodo: TodoItem = {
+      id: opportunity.id,
+      action: opportunity.recommendedAction || `Take action on ${opportunity.title}`,
+      location: opportunity.location,
+      date: opportunity.date,
+      completed: false,
+      type: opportunity.type,
+    };
+    setTodoItems((prev) => [...prev, newTodo]);
   };
 
-  const handleAccept = () => {
-    if (currentOpportunity) {
-      const newTodo: TodoItem = {
-        id: currentOpportunity.id,
-        action: currentOpportunity.recommendedAction || generateActionText(currentOpportunity),
-        location: currentOpportunity.location,
-        date: currentOpportunity.date,
-        completed: false,
-        type: currentOpportunity.type,
-      };
-      setTodoItems([...todoItems, newTodo]);
-      handleDismiss();
-    }
+  const handleStackComplete = () => {
+    setIsComplete(true);
   };
 
   const handleToggleTodo = (id: string) => {
@@ -119,12 +194,15 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
     );
   };
 
-  const handleProfileUpdate = (updates: Partial<{ drives: boolean; owns: boolean; hasChildren: boolean }>) => {
+  const handleProfileUpdate = (updates: Partial<VerificationAnswers>) => {
     onUpdateProfile(updates);
-    // Regenerate opportunities based on new profile
-    const newProfile = { ...userProfile, ...updates };
-    setOpportunities(generateOpportunities(newProfile));
-    setCurrentIndex(0);
+  };
+
+  // Simplified profile for sidebar (legacy support)
+  const legacyProfile = {
+    drives: userProfile.drives,
+    owns: userProfile.owns,
+    hasChildren: userProfile.hasChildren,
   };
 
   return (
@@ -132,17 +210,17 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
       {/* Left Sidebar - Profile (hidden on mobile) */}
       <div className="hidden md:block">
         <ProfileSidebar
-          userProfile={userProfile}
+          userProfile={legacyProfile}
           onEditProfile={() => setIsChatOpen(true)}
         />
       </div>
 
-      {/* Center - Focus Feed (Desktop) */}
+      {/* Center - Card Stack (Desktop) */}
       <main className="hidden md:flex flex-1 items-start justify-center p-8 pt-12">
-        <FocusCard
-          opportunity={currentOpportunity}
-          onDismiss={handleDismiss}
-          onAccept={handleAccept}
+        <CardStack
+          opportunities={opportunities}
+          onAccept={handleAcceptOpportunity}
+          onComplete={handleStackComplete}
         />
       </main>
 
@@ -164,7 +242,7 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
               className="min-h-screen"
             >
               <MobileProfileView
-                userProfile={userProfile}
+                userProfile={legacyProfile}
                 onEditProfile={() => setIsChatOpen(true)}
               />
             </motion.div>
@@ -179,10 +257,10 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
               transition={{ duration: 0.2 }}
               className="flex items-start justify-center p-4 pt-6"
             >
-              <FocusCard
-                opportunity={currentOpportunity}
-                onDismiss={handleDismiss}
-                onAccept={handleAccept}
+              <CardStack
+                opportunities={opportunities}
+                onAccept={handleAcceptOpportunity}
+                onComplete={handleStackComplete}
               />
             </motion.div>
           )}
@@ -440,16 +518,3 @@ const MobileTodoView = ({ items, onToggle }: MobileTodoViewProps) => {
     </div>
   );
 };
-
-function generateActionText(opportunity: ImpactOpportunity): string {
-  switch (opportunity.type) {
-    case "vote":
-      return `Vote on ${opportunity.title}`;
-    case "meeting":
-      return `Attend hearing for ${opportunity.title}`;
-    case "action":
-      return `Participate in ${opportunity.title}`;
-    default:
-      return opportunity.title;
-  }
-}
