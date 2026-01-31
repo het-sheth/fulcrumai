@@ -28,9 +28,24 @@ const convertEventToOpportunity = (event: CivicEvent): ImpactOpportunity => {
   const tags = event.impact_tags.map(t => t.toLowerCase());
   if (tags.includes("vote") || tags.includes("election") || tags.includes("ballot")) {
     type = "vote";
-  } else if (tags.includes("meeting") || tags.includes("hearing") || tags.includes("board")) {
+  } else if (tags.includes("meeting") || tags.includes("hearing") || tags.includes("board") || event.source_type?.includes("commission")) {
     type = "meeting";
   }
+
+  // Generate specific action based on event type and source
+  let recommendedAction = "";
+  if (type === "vote") {
+    recommendedAction = `Vote on this measure. Review the proposal and make your voice heard at the polls.`;
+  } else if (type === "meeting") {
+    recommendedAction = `Attend the hearing${event.location ? ` at ${event.location}` : ""}. Public comment periods let you directly influence the outcome.`;
+  } else {
+    recommendedAction = `Submit your feedback or sign up for updates. Your input shapes local policy decisions.`;
+  }
+
+  // Create a concise impact summary (not just tags)
+  const impactSummary = event.title.length > 50
+    ? event.title.substring(0, 47) + "..."
+    : event.title;
 
   return {
     id: event.id,
@@ -38,11 +53,11 @@ const convertEventToOpportunity = (event: CivicEvent): ImpactOpportunity => {
     urgency: urgencyMap[event.urgency] || "upcoming",
     title: event.title,
     description: event.summary || "No description available",
-    impactSummary: event.impact_tags.slice(0, 3).join(" · ") || "Civic engagement",
+    impactSummary,
     impact: event.summary || "This civic event may affect your community.",
     location: event.location,
     date: event.event_date ? new Date(event.event_date).toLocaleDateString() : undefined,
-    recommendedAction: `Learn more and take action on this ${type === "vote" ? "ballot measure" : type === "meeting" ? "public meeting" : "civic issue"}.`,
+    recommendedAction,
   };
 };
 
