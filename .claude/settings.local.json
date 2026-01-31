@@ -13,7 +13,10 @@
       "Bash(vercel --version:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(vercel --prod:*)",
+      "Bash(git fetch:*)",
+      "WebFetch(domain:id-preview--e9d18766-2f8a-42d9-a871-d0f06d0a9f1e.lovable.app)"
     ]
   },
   "enableAllProjectMcpServers": true,
