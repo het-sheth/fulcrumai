@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock,
@@ -71,6 +71,13 @@ export const CardStack = ({ opportunities, onAccept, onComplete, userEmail }: Ca
     success: false,
     message: "",
   });
+
+  // Update stack when opportunities prop changes (after async load)
+  useEffect(() => {
+    if (opportunities.length > 0 && stack.length === 0) {
+      setStack(opportunities);
+    }
+  }, [opportunities]);
 
   const currentCard = stack[0] ?? null;
   const remainingCount = stack.length;
