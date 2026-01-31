@@ -181,6 +181,18 @@ export const CardStack = ({ opportunities, onAccept, onComplete }: CardStackProp
                       {item.opportunity.title}
                     </p>
                   </div>
+                  {/* Google Calendar button for accepted meetings/votes */}
+                  {item.action === "accepted" && (item.opportunity.type === "meeting" || item.opportunity.type === "vote") && item.opportunity.date && (
+                    <a
+                      href={generateGoogleCalendarUrl(item.opportunity)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-shrink-0 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                      title="Add to Google Calendar"
+                    >
+                      <CalendarPlus className="w-4 h-4" />
+                    </a>
+                  )}
                   {item.action === "skipped" && (
                     <Button
                       variant="ghost"
