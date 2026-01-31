@@ -17,29 +17,20 @@ import {
   List,
   Megaphone,
   Heart,
+  Mail,
+  CheckCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { sendEventEmail, generateGoogleCalendarUrl as generateCalendarUrl } from "@/lib/email";
 
 // Generate Google Calendar URL for an event
 const generateGoogleCalendarUrl = (opportunity: ImpactOpportunity): string => {
-  const title = encodeURIComponent(opportunity.title);
-  const details = encodeURIComponent(
-    `${opportunity.description}\n\nWhat to do: ${opportunity.recommendedAction || "Take action"}`
-  );
-  const location = encodeURIComponent(opportunity.location || "San Francisco, CA");
-
-  // Parse date string to create calendar event
-  // Default to tomorrow at 10 AM if no specific time
-  const now = new Date();
-  const eventDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Tomorrow
-  eventDate.setHours(10, 0, 0, 0);
-
-  // Format: YYYYMMDDTHHmmssZ
-  const formatDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  const startDate = formatDate(eventDate);
-  const endDate = formatDate(new Date(eventDate.getTime() + 60 * 60 * 1000)); // 1 hour event
-
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startDate}/${endDate}`;
+  return generateCalendarUrl({
+    title: opportunity.title,
+    description: `${opportunity.description}\n\nWhat to do: ${opportunity.recommendedAction || "Take action"}`,
+    location: opportunity.location,
+    date: opportunity.date,
+  });
 };
 
 export interface ImpactOpportunity {
@@ -66,13 +57,19 @@ interface CardStackProps {
   opportunities: ImpactOpportunity[];
   onAccept: (opportunity: ImpactOpportunity) => void;
   onComplete: (reviewed: ReviewedCard[]) => void;
+  userEmail?: string;
 }
 
-export const CardStack = ({ opportunities, onAccept, onComplete }: CardStackProps) => {
+export const CardStack = ({ opportunities, onAccept, onComplete, userEmail }: CardStackProps) => {
   const [stack, setStack] = useState<ImpactOpportunity[]>(opportunities);
   const [reviewed, setReviewed] = useState<ReviewedCard[]>([]);
   const [showSummary, setShowSummary] = useState(false);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [emailStatus, setEmailStatus] = useState<{ show: boolean; success: boolean; message: string }>({
+    show: false,
+    success: false,
+    message: "",
+  });
 
   const currentCard = stack[0] ?? null;
   const remainingCount = stack.length;
@@ -95,7 +92,7 @@ export const CardStack = ({ opportunities, onAccept, onComplete }: CardStackProp
     }
   };
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     if (!currentCard) return;
 
     // Remove from stack
@@ -109,6 +106,27 @@ export const CardStack = ({ opportunities, onAccept, onComplete }: CardStackProp
 
     // Notify parent
     onAccept(currentCard);
+
+    // Send email notification
+    if (userEmail) {
+      const calendarLink = generateGoogleCalendarUrl(currentCard);
+      const result = await sendEventEmail({
+        toEmail: userEmail,
+        eventTitle: currentCard.title,
+        eventDate: currentCard.date,
+        eventLocation: currentCard.location,
+        eventDescription: `${currentCard.impactSummary}\n\n${currentCard.description}`,
+        calendarLink,
+        actionText: currentCard.recommendedAction || "Take action on this civic opportunity",
+      });
+
+      setEmailStatus({ show: true, success: result.success, message: result.message });
+
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        setEmailStatus({ show: false, success: false, message: "" });
+      }, 3000);
+    }
 
     // If stack is empty, show summary
     if (newStack.length === 0) {
@@ -252,6 +270,31 @@ export const CardStack = ({ opportunities, onAccept, onComplete }: CardStackProp
 
   return (
     <div className="w-full max-w-xl relative">
+      {/* Email sent notification */}
+      <AnimatePresence>
+        {emailStatus.show && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`absolute -top-16 left-0 right-0 z-50 flex items-center justify-center gap-2 px-4 py-3 rounded-lg ${
+              emailStatus.success
+                ? "bg-accent/20 border border-accent/30 text-accent"
+                : "bg-urgent/20 border border-urgent/30 text-urgent"
+            }`}
+          >
+            {emailStatus.success ? (
+              <CheckCheck className="w-5 h-5" />
+            ) : (
+              <AlertTriangle className="w-5 h-5" />
+            )}
+            <span className="text-sm font-medium">
+              {emailStatus.success ? "📧 Email sent! Check your inbox." : emailStatus.message}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Stack indicator */}
       <div className="flex items-center justify-between mb-4 px-1">
         <span className="text-sm text-muted-foreground">

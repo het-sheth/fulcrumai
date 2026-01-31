@@ -238,41 +238,38 @@ const generateOpportunities = (profile: VerificationAnswers): ImpactOpportunity[
 };
 
 export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
-  const [opportunities, setOpportunities] = useState<ImpactOpportunity[]>(() =>
-    generateOpportunities(userProfile)
-  );
+  const [opportunities, setOpportunities] = useState<ImpactOpportunity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [todoItems, setTodoItems] = useState<TodoItem[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>("feed");
   const [isComplete, setIsComplete] = useState(false);
 
-  // Fetch real civic events from API
+  // Fetch civic events from API (falls back to fallback-events.json)
   useEffect(() => {
     const fetchEvents = async () => {
-      if (!userProfile.email) {
-        setIsLoading(false);
-        return;
-      }
-
       try {
-        const response = await getDashboard(userProfile.email);
+        // getDashboard falls back to /fallback-events.json when backend unavailable
+        const response = await getDashboard(userProfile.email || "demo@fulcrum.ai");
 
         if (response.events && response.events.length > 0) {
-          // Convert API events to opportunities and merge with sponsored content
+          // Convert API events to opportunities
           const apiOpportunities = response.events.map(convertEventToOpportunity);
 
-          // Keep sponsored ads from generateOpportunities, but show AFTER real events for demo
+          // Add sponsored ads at the END (real civic content first for demo)
           const sponsoredAds = generateOpportunities(userProfile).filter(
             (o) => o.sponsoredBy
           );
 
-          // Real civic events first, then sponsored ads (better for demo video)
           setOpportunities([...apiOpportunities, ...sponsoredAds]);
+        } else {
+          // Fallback to generated opportunities if no events
+          setOpportunities(generateOpportunities(userProfile));
         }
       } catch (error) {
         console.error("Failed to fetch dashboard events:", error);
-        // Keep using mock data on error
+        // Last resort fallback
+        setOpportunities(generateOpportunities(userProfile));
       } finally {
         setIsLoading(false);
       }
@@ -333,6 +330,7 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
           opportunities={opportunities}
           onAccept={handleAcceptOpportunity}
           onComplete={handleStackComplete}
+          userEmail={userProfile.email}
         />
       </main>
 
@@ -373,6 +371,7 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
                 opportunities={opportunities}
                 onAccept={handleAcceptOpportunity}
                 onComplete={handleStackComplete}
+                userEmail={userProfile.email}
               />
             </motion.div>
           )}
