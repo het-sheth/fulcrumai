@@ -18,7 +18,8 @@
       "urgency": "High",
       "event_date": "2024-02-20T10:00:00Z",
       "source_type": "state_legislature",
-      "location": "State Capitol, Sacramento - Room 4203"
+      "location": "State Capitol, Sacramento - Room 4203",
+      "recommended_action": "Testify AGAINST overly restrictive AI regulations. Sign up for public comment at 9:30am and share how SB 1047 compliance costs would hurt YC startups."
     },
     {
       "id": "sf-housing-streamlining",
@@ -29,7 +30,8 @@
       "urgency": "High",
       "event_date": "2024-02-15T14:00:00Z",
       "source_type": "legistar",
-      "location": "City Hall, Board Chambers"
+      "location": "City Hall, Board Chambers",
+      "recommended_action": "Email your Supervisor to vote YES on the Streamlining Act. Call (415) 554-5184 before Thursday to register your support."
     },
     {
       "id": "sf-police-staffing",
@@ -40,7 +42,8 @@
       "urgency": "High",
       "event_date": "2024-02-14T17:00:00Z",
       "source_type": "police_commission",
-      "location": "City Hall, Room 400"
+      "location": "City Hall, Room 400",
+      "recommended_action": "Attend the 5pm hearing and speak in SUPPORT of the staffing plan during public comment. Mention response time concerns in your neighborhood."
     },
     {
       "id": "sf-startup-tax-relief",
@@ -51,7 +54,8 @@
       "urgency": "High",
       "event_date": "2024-02-22T10:00:00Z",
       "source_type": "legistar",
-      "location": "City Hall, Room 263"
+      "location": "City Hall, Room 263",
+      "recommended_action": "Submit written testimony supporting the tax extension by Feb 21st. Email budget.committee@sfgov.org with examples of startups that would benefit."
     },
     {
       "id": "sf-homelessness-accountability",
@@ -62,7 +66,8 @@
       "urgency": "Medium",
       "event_date": "2024-02-28T13:00:00Z",
       "source_type": "controller",
-      "location": "City Hall, Board Chambers"
+      "location": "City Hall, Board Chambers",
+      "recommended_action": "Attend the 1pm hearing and demand outcome-based metrics. Ask why $1.1B hasn't reduced visible homelessness in SoMa and downtown."
     },
     {
       "id": "sf-ceqa-reform",
@@ -73,7 +78,8 @@
       "urgency": "Medium",
       "event_date": "2024-03-07T13:00:00Z",
       "source_type": "planning",
-      "location": "SF Planning Dept, 49 South Van Ness"
+      "location": "SF Planning Dept, 49 South Van Ness",
+      "recommended_action": "Sign up to speak at the 1pm hearing in SUPPORT of CEQA reform. Emphasize that transit-adjacent housing reduces car dependence and IS environmentally friendly."
     },
     {
       "id": "sf-autonomous-vehicles",
@@ -84,7 +90,8 @@
       "urgency": "Medium",
       "event_date": "2024-03-12T09:00:00Z",
       "source_type": "state_agency",
-      "location": "CPUC Auditorium, 505 Van Ness Ave"
+      "location": "CPUC Auditorium, 505 Van Ness Ave",
+      "recommended_action": "Submit written comment SUPPORTING AV expansion at cpuc.ca.gov/av-comments by March 10th. Cite safety data showing AVs have fewer accidents per mile than human drivers."
     },
     {
       "id": "sf-da-jenkins-policy",
@@ -95,7 +102,8 @@
       "urgency": "Medium",
       "event_date": "2024-03-05T18:00:00Z",
       "source_type": "district_attorney",
-      "location": "Hall of Justice, Room 201"
+      "location": "Hall of Justice, Room 201",
+      "recommended_action": "Attend the 6pm forum and voice SUPPORT for stricter prosecution of repeat offenders. Share how retail theft affects businesses you frequent or invest in."
     },
     {
       "id": "sf-office-conversion",
@@ -106,7 +114,8 @@
       "urgency": "Medium",
       "event_date": "2024-03-14T11:00:00Z",
       "source_type": "mayors_office",
-      "location": "Mayor's Office, City Hall"
+      "location": "Mayor's Office, City Hall",
+      "recommended_action": "Tweet SUPPORT for office-to-housing conversions and tag @LondonBreed. Rally tech leaders to publicly endorse the incentive program."
     },
     {
       "id": "sf-tech-visa-resolution",
@@ -117,7 +126,8 @@
       "urgency": "Low",
       "event_date": "2024-03-19T14:00:00Z",
       "source_type": "legistar",
-      "location": "City Hall, Board Chambers"
+      "location": "City Hall, Board Chambers",
+      "recommended_action": "Testify at the 2pm hearing about YC founders lost to Canada's visa program. Bring specific examples of international founders who had to relocate."
     }
   ],
   "match_explanation": "Showing civic events matching your interests in AI policy, housing development, public safety, and startup-friendly policies in San Francisco."

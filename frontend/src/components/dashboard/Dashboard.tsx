@@ -32,14 +32,16 @@ const convertEventToOpportunity = (event: CivicEvent): ImpactOpportunity => {
     type = "meeting";
   }
 
-  // Generate specific action based on event type and source
-  let recommendedAction = "";
-  if (type === "vote") {
-    recommendedAction = `Vote on this measure. Review the proposal and make your voice heard at the polls.`;
-  } else if (type === "meeting") {
-    recommendedAction = `Attend the hearing${event.location ? ` at ${event.location}` : ""}. Public comment periods let you directly influence the outcome.`;
-  } else {
-    recommendedAction = `Submit your feedback or sign up for updates. Your input shapes local policy decisions.`;
+  // Use specific action from event data, or generate fallback
+  let recommendedAction = event.recommended_action || "";
+  if (!recommendedAction) {
+    if (type === "vote") {
+      recommendedAction = `Vote on this measure. Review the proposal and make your voice heard at the polls.`;
+    } else if (type === "meeting") {
+      recommendedAction = `Attend the hearing${event.location ? ` at ${event.location}` : ""}. Public comment periods let you directly influence the outcome.`;
+    } else {
+      recommendedAction = `Submit your feedback or sign up for updates. Your input shapes local policy decisions.`;
+    }
   }
 
   // Create a concise impact summary (not just tags)

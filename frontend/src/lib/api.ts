@@ -116,6 +116,7 @@ export interface CivicEvent {
   event_date?: string;
   source_type?: string;
   location?: string;
+  recommended_action?: string;
 }
 
 export interface UserProfile {
