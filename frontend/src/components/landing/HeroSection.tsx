@@ -66,11 +66,11 @@ export const HeroSection = ({ onAnalyze }: HeroSectionProps) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
+          className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight"
         >
-          <span className="text-foreground">Democracy is decided by</span>
+          <span className="text-foreground">Democracy is decided</span>
           <br />
-          <span className="text-foreground">those who </span>
+          <span className="text-foreground">by those who </span>
           <span className="text-primary">show up.</span>
         </motion.h1>
 
