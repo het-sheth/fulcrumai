@@ -64,6 +64,7 @@ export const CardStack = ({ opportunities, onAccept, onComplete, userEmail }: Ca
   const [stack, setStack] = useState<ImpactOpportunity[]>(opportunities);
   const [reviewed, setReviewed] = useState<ReviewedCard[]>([]);
   const [showSummary, setShowSummary] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [emailStatus, setEmailStatus] = useState<{ show: boolean; success: boolean; message: string }>({
     show: false,
@@ -144,8 +145,39 @@ export const CardStack = ({ opportunities, onAccept, onComplete, userEmail }: Ca
   };
 
   const handleFinish = () => {
+    setIsFinished(true);
+    setShowSummary(false);
     onComplete(reviewed);
   };
+
+  // Finished state - shown after clicking "Done Reviewing"
+  if (isFinished) {
+    const acceptedCount = reviewed.filter(r => r.action === "accepted").length;
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-xl"
+      >
+        <div className="card-elevated rounded-2xl overflow-hidden p-8 text-center">
+          <div className="w-20 h-20 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-10 h-10 text-accent" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">You're All Set!</h2>
+          <p className="text-muted-foreground mb-6">
+            {acceptedCount > 0
+              ? `You've added ${acceptedCount} civic action${acceptedCount > 1 ? 's' : ''} to your to-do list.`
+              : "Check back later for new civic opportunities in your area."}
+          </p>
+          {acceptedCount > 0 && (
+            <p className="text-sm text-muted-foreground">
+              📧 Email confirmations sent · 📅 Add events to your calendar from the Actions tab
+            </p>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
 
   // Summary View
   if (showSummary) {
