@@ -137,3 +137,104 @@ Where the protests and organizing happen.
 | State Laws | OpenStates / LegiScan | API (JSON) | "SB 423: Housing Streamlining" |
 | Fed Laws | Congress.gov | API (JSON) | "HR 1: For the People Act" |
 | Activism | Mobilize.us / Reddit | Scrape / API | "Rally at City Hall at 5 PM" |
+
+---
+
+# Fulcrum.ai Frontend Specification (React + Tailwind)
+
+**Goal:** A "Magic" interface. Clean, dark-mode, futuristic (think "Palantir for Citizens").
+**Vibe:** High-contrast, serious, data-dense but readable.
+
+## 1. Page Flow
+
+### A. Landing Page ("The Hook")
+* **Hero:** "Democracy is decided by those who show up. We tell you where to show up."
+* **Action:** Simple input field: [ Enter your Email / LinkedIn ] -> Button: "Analyze My Impact".
+
+### B. The "Mirror" (Onboarding/Verification)
+* **State:** Loading spinner saying "Analyzing digital footprint via Nyne.ai..." (Fake a 2s delay for effect).
+* **Display:** Show a "Dossier" card.
+    * "We found this about you:" [Avatar] [Job Title] [Inferred Neighborhood].
+    * **Interaction:** "Is this correct?" [Yes/Edit].
+* **The "Gap" Questions:**
+    * After verification, slide in 3 cards asking specific lifestyle questions:
+    * 1. [Icon: Car] "Do you drive in the city?" (Yes/No)
+    * 2. [Icon: House] "Do you rent or own?" (Rent/Own)
+    * 3. [Icon: Baby] "Do you have children in SFUSD?" (Yes/No)
+* *Why:* This data is critical for the "Parking" and "Zoning" matching logic.
+
+### C. The Dashboard ("The Fulcrum")
+* **Layout:** Two columns.
+    * **Left (Your Profile):** Small summary of the User + "Civic Strengths" (e.g., "Tech Policy Expert").
+    * **Right (The Feed):** A list of "Impact Opportunities."
+* **Card Design (Critical for Beauty Award):**
+    * **Header:** "URGENT: Vote in 48h" (Red badge).
+    * **Title:** "Parking Meter Extension"
+    * **Why it matters (AI Gen):** "Because you drive a car and live in Mission, this will cost you ~$400/year."
+    * **Action Buttons:** [Read Draft] [Email Supervisor (One-click)] [Ignore].
+
+## 2. Technical Requirements
+* **Framework:** Next.js or React (Vite).
+* **Styling:** Tailwind CSS. Use "Zinc" or "Slate" colors.
+* **Icons:** Lucide-React (use `Gavel`, `Car`, `Building`, `AlertTriangle`).
+* **API:** Connects to the FastAPI backend endpoints defined above.
+
+## 3. The "Wow" Factor (Demo Mode)
+* When the user answers "Yes" to lifestyle questions, dynamically surface relevant impact opportunities with personalized explanations.
+
+---
+
+# Fulcrum.ai Backend Specification (FastAPI + Hyperspell + Nyne)
+
+**Goal:** Build a high-velocity backend to match SF citizens with civic events.
+**Time Limit:** 2 hours. Focus on "Happy Path" only.
+
+## 1. Stack
+* **Language:** Python 3.9+
+* **Framework:** FastAPI
+* **Database:** Hyperspell (https://docs.hyperspell.com/core/introduction)
+* **Enrichment:** Nyne.ai API
+* **LLM:** OpenAI/Anthropic (via LangChain or direct) for parsing legislation text.
+
+## 2. Data Models (Hyperspell Schema)
+We need two core "Nodes" in Hyperspell: `User` and `CivicEvent`.
+
+* **User Object:**
+    * `id`: email
+    * `attributes`: { "zip_code": "94110", "has_car": true, "has_kids": false, "profession": "tech" }
+    * `interests`: ["housing", "ai_safety", "bike_lanes"]
+
+* **CivicEvent Object:**
+    * `id`: source_url
+    * `title`: "SFMTA Board Meeting - Slow Streets"
+    * `impact_tags`: ["traffic", "parking", "families"]
+    * `urgency`: "High" (Vote in 48h)
+    * `summary`: "Vote to remove parking on Valencia St."
+
+## 3. API Endpoints
+
+### `POST /onboard`
+* **Input:** `{ "email": "user@example.com", "linkedin_url": "..." }`
+* **Logic:**
+    1.  Call **Nyne.ai** with the email/LinkedIn to infer profile.
+    2.  Return the inferred JSON to Frontend:
+        ```json
+        {
+          "inferred": {
+            "profession": "Software Engineer",
+            "likely_location": "San Francisco, SoMa",
+            "interests": ["Tech Policy", "Startups"]
+          },
+          "questions_to_ask": ["Do you own a car?", "Do you rent or own your home?"]
+        }
+        ```
+    3.  *Note:* Do NOT save to Hyperspell yet. Wait for user confirmation.
+
+### `POST /confirm-profile`
+* **Input:** Final JSON with user-verified data + answers to questions (e.g., "has_car": true).
+* **Logic:** Save/Update `User` node in Hyperspell.
+
+### `GET /dashboard/{email}`
+* **Logic:**
+    1.  Fetch `User` from Hyperspell.
+    2.  Query Hyperspell for `CivicEvents` where `impact_tags` overlap with `User.interests` OR `User.attributes` (e.g., if `has_car`=true, match events tagged with "parking" or "traffic").
