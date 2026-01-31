@@ -25,12 +25,14 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { InferredProfile } from "@/lib/api";
 
 interface ProfileSidebarProps {
   userProfile: {
     drives: boolean;
     owns: boolean;
     hasChildren: boolean;
+    enrichedProfile?: InferredProfile;
   };
   onEditProfile: () => void;
 }
@@ -55,6 +57,18 @@ const socialInsights = [
 export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarProps) => {
   const [showMoreValues, setShowMoreValues] = useState(false);
 
+  // Extract profile data with fallbacks
+  const profile = userProfile.enrichedProfile;
+  const displayName = profile?.full_name || "User";
+  const headline = profile?.headline || profile?.profession || "SF Resident";
+  const location = profile?.likely_location || profile?.city || "San Francisco";
+  const bio = profile?.bio || "";
+  const skills = profile?.skills || [];
+  const education = profile?.education?.[0];
+  const profilePhoto = typeof profile?.social_profiles?.linkedin === 'object'
+    ? profile?.social_profiles?.linkedin?.photo_url
+    : null;
+
   return (
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
@@ -76,28 +90,36 @@ export const ProfileSidebar = ({ userProfile, onEditProfile }: ProfileSidebarPro
       <div className="card-elevated p-5 rounded-xl mb-6">
         <div className="flex items-start gap-4 mb-5">
           {/* Avatar */}
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <User className="w-7 h-7 text-primary-foreground" />
-          </div>
+          {profilePhoto ? (
+            <img
+              src={profilePhoto}
+              alt={displayName}
+              className="w-14 h-14 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <User className="w-7 h-7 text-primary-foreground" />
+            </div>
+          )}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground">Alex Mercer</h3>
-            <p className="text-sm text-muted-foreground">32 years old</p>
+            <h3 className="font-semibold text-foreground">{displayName}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">{headline}</p>
           </div>
         </div>
 
         {/* Micro CV - Bullet Points */}
         <div className="space-y-2.5 mb-5">
-          <CVItem icon={MapPin} text="Mission District, SF (94110)" />
-          <CVItem icon={Briefcase} text="Senior Engineer @ Stripe" />
-          <CVItem icon={Calendar} text="SF Resident since 2018" />
-          {userProfile.drives && <CVItem icon={Car} text="Drives daily (Valencia St)" />}
+          <CVItem icon={MapPin} text={location} />
+          {profile?.profession && <CVItem icon={Briefcase} text={profile.profession} />}
+          {education?.school && <CVItem icon={GraduationCap} text={`${education.degree || ''} ${education.school}`} />}
+          {userProfile.drives && <CVItem icon={Car} text="Drives in the city" />}
           {userProfile.owns ? (
             <CVItem icon={Home} text="Homeowner" color="accent" />
           ) : (
             <CVItem icon={Home} text="Renter" color="warning" />
           )}
-          {userProfile.hasChildren && <CVItem icon={Baby} text="SFUSD Parent" color="info" />}
-          <CVItem icon={Laptop} text="Tech Industry" />
+          {userProfile.hasChildren && <CVItem icon={Baby} text="Has children" color="info" />}
+          {skills.length > 0 && <CVItem icon={Laptop} text={skills.slice(0, 3).join(", ")} />}
         </div>
 
         <Button

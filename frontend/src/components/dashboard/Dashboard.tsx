@@ -6,10 +6,10 @@ import { CivicTodoList, TodoItem } from "./CivicTodoList";
 import { ChatbotModal } from "./ChatbotModal";
 import { BottomNav, MobileTab } from "../mobile/BottomNav";
 import { VerificationAnswers } from "../verification/VerificationCards";
-import { getDashboard, CivicEvent } from "@/lib/api";
+import { getDashboard, CivicEvent, InferredProfile } from "@/lib/api";
 
 interface DashboardProps {
-  userProfile: VerificationAnswers & { email?: string };
+  userProfile: VerificationAnswers & { email?: string; enrichedProfile?: InferredProfile };
   onUpdateProfile: (updates: Partial<VerificationAnswers>) => void;
 }
 
@@ -309,11 +309,12 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
     onUpdateProfile(updates);
   };
 
-  // Simplified profile for sidebar (legacy support)
-  const legacyProfile = {
+  // Profile data for sidebar components
+  const profileForSidebar = {
     drives: userProfile.drives,
     owns: userProfile.owns,
     hasChildren: userProfile.hasChildren,
+    enrichedProfile: userProfile.enrichedProfile,
   };
 
   return (
@@ -321,7 +322,7 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
       {/* Left Sidebar - Profile (hidden on mobile) */}
       <div className="hidden md:block">
         <ProfileSidebar
-          userProfile={legacyProfile}
+          userProfile={profileForSidebar}
           onEditProfile={() => setIsChatOpen(true)}
         />
       </div>
@@ -353,7 +354,7 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
               className="min-h-screen"
             >
               <MobileProfileView
-                userProfile={legacyProfile}
+                userProfile={profileForSidebar}
                 onEditProfile={() => setIsChatOpen(true)}
               />
             </motion.div>
@@ -432,11 +433,22 @@ interface MobileProfileViewProps {
     drives: boolean;
     owns: boolean;
     hasChildren: boolean;
+    enrichedProfile?: InferredProfile;
   };
   onEditProfile: () => void;
 }
 
 const MobileProfileView = ({ userProfile, onEditProfile }: MobileProfileViewProps) => {
+  // Extract profile data with fallbacks
+  const profile = userProfile.enrichedProfile;
+  const displayName = profile?.full_name || "User";
+  const headline = profile?.headline || profile?.profession || "SF Resident";
+  const location = profile?.likely_location || profile?.city || "San Francisco";
+  const skills = profile?.skills || [];
+  const profilePhoto = typeof profile?.social_profiles?.linkedin === 'object'
+    ? (profile?.social_profiles?.linkedin as { photo_url?: string })?.photo_url
+    : null;
+
   return (
     <div className="p-4 space-y-4">
       {/* Header */}
@@ -454,28 +466,35 @@ const MobileProfileView = ({ userProfile, onEditProfile }: MobileProfileViewProp
       {/* User Card */}
       <div className="card-elevated p-5 rounded-xl">
         <div className="flex items-start gap-4 mb-5">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <User className="w-7 h-7 text-primary-foreground" />
-          </div>
+          {profilePhoto ? (
+            <img
+              src={profilePhoto}
+              alt={displayName}
+              className="w-14 h-14 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <User className="w-7 h-7 text-primary-foreground" />
+            </div>
+          )}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground">Alex Mercer</h3>
-            <p className="text-sm text-muted-foreground">32 years old</p>
+            <h3 className="font-semibold text-foreground">{displayName}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">{headline}</p>
           </div>
         </div>
 
         {/* Micro CV */}
         <div className="space-y-2.5 mb-5">
-          <CVItemMobile icon={MapPin} text="Mission District, SF" />
-          <CVItemMobile icon={Briefcase} text="Senior Engineer @ Stripe" />
-          <CVItemMobile icon={Calendar} text="SF Resident since 2018" />
-          {userProfile.drives && <CVItemMobile icon={Car} text="Drives daily" />}
+          <CVItemMobile icon={MapPin} text={location} />
+          {profile?.profession && <CVItemMobile icon={Briefcase} text={profile.profession} />}
+          {userProfile.drives && <CVItemMobile icon={Car} text="Drives in the city" />}
           {userProfile.owns ? (
             <CVItemMobile icon={Home} text="Homeowner" />
           ) : (
             <CVItemMobile icon={Home} text="Renter" />
           )}
-          {userProfile.hasChildren && <CVItemMobile icon={Baby} text="SFUSD Parent" />}
-          <CVItemMobile icon={Laptop} text="Tech Industry" />
+          {userProfile.hasChildren && <CVItemMobile icon={Baby} text="Has children" />}
+          {skills.length > 0 && <CVItemMobile icon={Laptop} text={skills.slice(0, 2).join(", ")} />}
         </div>
 
         <Button variant="outline" size="sm" className="w-full" onClick={onEditProfile}>
