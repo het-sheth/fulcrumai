@@ -1,0 +1,100 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.13, pytest-8.4.2, pluggy-1.6.0 -- /Library/Frameworks/Python.framework/Versions/3.9/bin/python3.9
+cachedir: .pytest_cache
+rootdir: /Users/ishaan/Projects/c0mpile-before-the-ballot/backend
+configfile: pytest.ini
+plugins: asyncio-1.2.0, anyio-4.11.0
+asyncio: mode=auto, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 41 items
+
+tests/test_api_civic_data.py::TestDashboardEndpoint::test_dashboard_returns_200_for_existing_user PASSED [  2%]
+tests/test_api_civic_data.py::TestDashboardEndpoint::test_dashboard_returns_404_for_unknown_user PASSED [  4%]
+tests/test_api_civic_data.py::TestDashboardEndpoint::test_dashboard_returns_user_profile PASSED [  7%]
+tests/test_api_civic_data.py::TestDashboardEndpoint::test_dashboard_returns_civic_events PASSED [  9%]
+tests/test_api_civic_data.py::TestDashboardEndpoint::test_dashboard_returns_match_explanation PASSED [ 12%]
+tests/test_api_civic_data.py::TestCivicEventData::test_events_have_required_fields PASSED [ 14%]
+tests/test_api_civic_data.py::TestCivicEventData::test_events_have_civic_content_fields PASSED [ 17%]
+tests/test_api_civic_data.py::TestCivicEventData::test_events_contain_legislative_data PASSED [ 19%]
+tests/test_api_civic_data.py::TestCivicEventData::test_events_have_valid_urgency_values PASSED [ 21%]
+tests/test_api_civic_data.py::TestCivicEventData::test_events_have_impact_tags_as_array PASSED [ 24%]
+tests/test_api_civic_data.py::TestCivicEventData::test_events_cover_civic_topics PASSED [ 26%]
+tests/test_api_civic_data.py::TestCivicEventData::test_events_have_source_urls PASSED [ 29%]
+tests/test_api_civic_data.py::TestEventMatching::test_events_match_user_interests PASSED [ 31%]
+tests/test_api_civic_data.py::TestEventMatching::test_high_urgency_events_appear_first PASSED [ 34%]
+tests/test_api_civic_data.py::TestOnboardEndpoint::test_onboard_returns_200 PASSED [ 36%]
+tests/test_api_civic_data.py::TestOnboardEndpoint::test_onboard_returns_inferred_profile PASSED [ 39%]
+tests/test_api_civic_data.py::TestOnboardEndpoint::test_onboard_returns_followup_questions PASSED [ 41%]
+tests/test_api_civic_data.py::TestOnboardEndpoint::test_onboard_with_linkedin PASSED [ 43%]
+tests/test_api_civic_data.py::TestConfirmProfileEndpoint::test_confirm_profile_creates_user PASSED [ 46%]
+tests/test_api_civic_data.py::TestConfirmProfileEndpoint::test_confirm_profile_requires_email PASSED [ 48%]
+tests/test_api_civic_data.py::TestHealthCheck::test_root_or_health_endpoint PASSED [ 51%]
+tests/test_supabase_data.py::TestSupabaseConnection::test_supabase_client_initializes PASSED [ 53%]
+tests/test_supabase_data.py::TestSupabaseConnection::test_supabase_url_configured PASSED [ 56%]
+tests/test_supabase_data.py::TestSupabaseConnection::test_supabase_key_configured PASSED [ 58%]
+tests/test_supabase_data.py::TestUsersTable::test_can_query_users_table PASSED [ 60%]
+tests/test_supabase_data.py::TestUsersTable::test_users_table_has_data PASSED [ 63%]
+tests/test_supabase_data.py::TestUsersTable::test_user_has_required_fields PASSED [ 65%]
+tests/test_supabase_data.py::TestUsersTable::test_user_has_expected_optional_fields PASSED [ 68%]
+tests/test_supabase_data.py::TestUsersTable::test_get_user_by_email_returns_user PASSED [ 70%]
+tests/test_supabase_data.py::TestUsersTable::test_get_user_by_email_returns_none_for_nonexistent PASSED [ 73%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_can_query_civic_events_table PASSED [ 75%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_civic_events_table_has_data PASSED [ 78%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_civic_event_has_required_fields PASSED [ 80%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_civic_event_has_spec_fields PASSED [ 82%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_civic_event_urgency_valid_values PASSED [ 85%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_civic_event_impact_tags_is_array PASSED [ 87%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_get_all_events_returns_list PASSED [ 90%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_get_all_events_respects_limit PASSED [ 92%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_get_events_by_tags_filters_correctly PASSED [ 95%]
+tests/test_supabase_data.py::TestCivicEventsTable::test_get_events_by_tags_empty_list_returns_empty PASSED [ 97%]
+tests/test_supabase_data.py::TestDataIntegrity::test_user_interests_can_match_event_tags PASSED [100%]
+
+=============================== warnings summary ===============================
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:366
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:366: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, data: TableMetadataV1) -> TableMetadataV1:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:495
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:495: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:499
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:499: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:503
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:503: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:507
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:507: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:539
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:539: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:543
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:543: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:547
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:547: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+../../../../../Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:551
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/pyiceberg/table/metadata.py:551: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+tests/test_api_civic_data.py::TestDashboardEndpoint::test_dashboard_returns_200_for_existing_user
+tests/test_supabase_data.py::TestUsersTable::test_can_query_users_table
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/supabase/_sync/client.py:309: DeprecationWarning: The 'timeout' parameter is deprecated. Please configure it in the http client instead.
+    return SyncPostgrestClient(
+
+tests/test_api_civic_data.py::TestDashboardEndpoint::test_dashboard_returns_200_for_existing_user
+tests/test_supabase_data.py::TestUsersTable::test_can_query_users_table
+  /Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/supabase/_sync/client.py:309: DeprecationWarning: The 'verify' parameter is deprecated. Please configure it in the http client instead.
+    return SyncPostgrestClient(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 41 passed, 13 warnings in 4.54s ========================
