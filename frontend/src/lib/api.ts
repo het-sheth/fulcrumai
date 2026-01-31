@@ -117,6 +117,7 @@ export interface CivicEvent {
   source_type?: string;
   location?: string;
   recommended_action?: string;
+  sponsored_by?: string;
 }
 
 export interface UserProfile {

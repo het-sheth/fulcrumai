@@ -60,6 +60,7 @@ const convertEventToOpportunity = (event: CivicEvent): ImpactOpportunity => {
     location: event.location,
     date: event.event_date ? new Date(event.event_date).toLocaleDateString() : undefined,
     recommendedAction,
+    sponsoredBy: event.sponsored_by,
   };
 };
 
