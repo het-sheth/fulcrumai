@@ -196,14 +196,29 @@ export const CardStack = ({ opportunities, onAccept, onComplete, userEmail }: Ca
       >
         <div className="card-elevated rounded-2xl overflow-hidden">
           <div className="p-5 border-b border-border">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-accent/10">
-                <List className="w-5 h-5 text-accent" />
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-accent/10">
+                  <List className="w-5 h-5 text-accent" />
+                </div>
+                <h2 className="text-xl font-bold text-foreground">Review Summary</h2>
               </div>
-              <h2 className="text-xl font-bold text-foreground">Review Summary</h2>
+              {/* Back to cards button */}
+              {stack.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSummary(false)}
+                >
+                  <ArrowRight className="w-4 h-4 mr-1 rotate-180" />
+                  Back to cards
+                </Button>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">
-              You reviewed {opportunities.length} civic opportunities
+              {stack.length > 0
+                ? `${stack.length} cards remaining · ${reviewed.length} reviewed`
+                : `You reviewed ${reviewed.length} civic opportunities`}
             </p>
           </div>
 
@@ -238,8 +253,8 @@ export const CardStack = ({ opportunities, onAccept, onComplete, userEmail }: Ca
                       {item.opportunity.title}
                     </p>
                   </div>
-                  {/* Google Calendar button for accepted meetings/votes */}
-                  {item.action === "accepted" && (item.opportunity.type === "meeting" || item.opportunity.type === "vote") && item.opportunity.date && (
+                  {/* Google Calendar button for all accepted items */}
+                  {item.action === "accepted" && (
                     <a
                       href={generateGoogleCalendarUrl(item.opportunity)}
                       target="_blank"

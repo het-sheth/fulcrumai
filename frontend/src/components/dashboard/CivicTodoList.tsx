@@ -4,6 +4,7 @@ import {
   Circle,
   MapPin,
   Calendar,
+  CalendarPlus,
   ChevronRight,
   Vote,
   Hand,
@@ -13,11 +14,14 @@ import {
 
 export interface TodoItem {
   id: string;
+  title: string;
   action: string;
+  description?: string;
   location?: string;
   date?: string;
   completed: boolean;
   type?: "vote" | "meeting" | "action";
+  calendarUrl?: string;
 }
 
 interface CivicTodoListProps {
@@ -133,13 +137,28 @@ export const CivicTodoList = ({ items, onToggle }: CivicTodoListProps) => {
                         </div>
                       )}
 
+                      {/* Title */}
                       <p
-                        className={`text-sm font-medium leading-snug ${
+                        className={`text-sm font-semibold leading-snug mb-1 ${
                           item.completed ? "text-muted-foreground line-through" : "text-foreground"
                         }`}
                       >
-                        {item.action}
+                        {item.title}
                       </p>
+
+                      {/* Description snippet */}
+                      {item.description && !item.completed && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                          {item.description}
+                        </p>
+                      )}
+
+                      {/* Action to take */}
+                      {!item.completed && (
+                        <p className="text-xs text-primary font-medium">
+                          → {item.action}
+                        </p>
+                      )}
 
                       {/* Meta */}
                       <div className="mt-2 flex flex-col gap-1 text-xs text-muted-foreground">
@@ -158,9 +177,18 @@ export const CivicTodoList = ({ items, onToggle }: CivicTodoListProps) => {
                       </div>
                     </div>
 
-                    {/* Arrow */}
-                    {!item.completed && (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {/* Calendar button */}
+                    {!item.completed && item.calendarUrl && (
+                      <a
+                        href={item.calendarUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex-shrink-0 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                        title="Add to Google Calendar"
+                      >
+                        <CalendarPlus className="w-4 h-4" />
+                      </a>
                     )}
                   </div>
                 </motion.div>

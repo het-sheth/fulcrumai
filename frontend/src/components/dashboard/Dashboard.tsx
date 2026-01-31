@@ -7,6 +7,7 @@ import { ChatbotModal } from "./ChatbotModal";
 import { BottomNav, MobileTab } from "../mobile/BottomNav";
 import { VerificationAnswers } from "../verification/VerificationCards";
 import { getDashboard, CivicEvent, InferredProfile } from "@/lib/api";
+import { generateGoogleCalendarUrl } from "@/lib/email";
 
 interface DashboardProps {
   userProfile: VerificationAnswers & { email?: string; enrichedProfile?: InferredProfile };
@@ -279,13 +280,23 @@ export const Dashboard = ({ userProfile, onUpdateProfile }: DashboardProps) => {
   }, [userProfile.email]);
 
   const handleAcceptOpportunity = (opportunity: ImpactOpportunity) => {
+    const calendarUrl = generateGoogleCalendarUrl({
+      title: opportunity.title,
+      description: `${opportunity.description}\n\nAction: ${opportunity.recommendedAction || "Take action"}`,
+      location: opportunity.location,
+      date: opportunity.date,
+    });
+
     const newTodo: TodoItem = {
       id: opportunity.id,
-      action: opportunity.recommendedAction || `Take action on ${opportunity.title}`,
+      title: opportunity.title,
+      action: opportunity.recommendedAction || `Take action on this civic opportunity`,
+      description: opportunity.impact || opportunity.description,
       location: opportunity.location,
       date: opportunity.date,
       completed: false,
       type: opportunity.type,
+      calendarUrl,
     };
     setTodoItems((prev) => [...prev, newTodo]);
   };
