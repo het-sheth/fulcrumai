@@ -46,6 +46,19 @@
       "recommended_action": "Attend the 5pm hearing and speak in SUPPORT of the staffing plan during public comment. Mention response time concerns in your neighborhood."
     },
     {
+      "id": "sponsored-yc-founders",
+      "source_url": "https://www.ycombinator.com/future-founders",
+      "title": "YC Future Founders Program: Apply Now",
+      "summary": "Y Combinator is accepting applications for the Future Founders program. Get $500K in funding, mentorship from top founders, and access to the YC network. Perfect for technical founders building in AI, climate, or govtech.",
+      "impact_tags": ["startups", "funding", "technology", "opportunity"],
+      "urgency": "High",
+      "event_date": "2024-03-01T23:59:00Z",
+      "source_type": "sponsored",
+      "location": "Online Application",
+      "recommended_action": "Apply to YC before the March 1st deadline. Prepare your 1-minute video and complete the application at ycombinator.com/apply.",
+      "sponsored_by": "Y Combinator"
+    },
+    {
       "id": "sf-startup-tax-relief",
       "source_url": "https://sftreasurer.org/business",
       "title": "Budget Committee: Startup Tax Incentive Extension",
@@ -56,6 +69,19 @@
       "source_type": "legistar",
       "location": "City Hall, Room 263",
       "recommended_action": "Submit written testimony supporting the tax extension by Feb 21st. Email budget.committee@sfgov.org with examples of startups that would benefit."
+    },
+    {
+      "id": "sponsored-sf-solar",
+      "source_url": "https://www.sfenvironment.org/solar",
+      "title": "GoSolarSF: 30% Tax Credit Expires Dec 31",
+      "summary": "California's 30% solar tax credit expires this year. SF homeowners can save $8,000-$15,000 on installation. The GoSolarSF program offers additional rebates for qualifying residents.",
+      "impact_tags": ["climate", "homeowners", "tax_credits", "savings"],
+      "urgency": "High",
+      "event_date": "2024-12-31T23:59:00Z",
+      "source_type": "sponsored",
+      "location": "Your Home",
+      "recommended_action": "Get a free solar assessment at GoSolarSF.org. Lock in your 30% federal tax credit before it drops to 26% next year.",
+      "sponsored_by": "GoSolarSF Coalition"
     },
     {
       "id": "sf-homelessness-accountability",
@@ -128,32 +154,6 @@
       "source_type": "legistar",
       "location": "City Hall, Board Chambers",
       "recommended_action": "Testify at the 2pm hearing about YC founders lost to Canada's visa program. Bring specific examples of international founders who had to relocate."
-    },
-    {
-      "id": "sponsored-yc-founders",
-      "source_url": "https://www.ycombinator.com/future-founders",
-      "title": "YC Future Founders Program: Apply Now",
-      "summary": "Y Combinator is accepting applications for the Future Founders program. Get $500K in funding, mentorship from top founders, and access to the YC network. Perfect for technical founders building in AI, climate, or govtech.",
-      "impact_tags": ["startups", "funding", "technology", "opportunity"],
-      "urgency": "High",
-      "event_date": "2024-03-01T23:59:00Z",
-      "source_type": "sponsored",
-      "location": "Online Application",
-      "recommended_action": "Apply to YC before the March 1st deadline. Prepare your 1-minute video and complete the application at ycombinator.com/apply.",
-      "sponsored_by": "Y Combinator"
-    },
-    {
-      "id": "sponsored-sf-solar",
-      "source_url": "https://www.sfenvironment.org/solar",
-      "title": "GoSolarSF: 30% Tax Credit Expires Dec 31",
-      "summary": "California's 30% solar tax credit expires this year. SF homeowners can save $8,000-$15,000 on installation. The GoSolarSF program offers additional rebates for qualifying residents.",
-      "impact_tags": ["climate", "homeowners", "tax_credits", "savings"],
-      "urgency": "High",
-      "event_date": "2024-12-31T23:59:00Z",
-      "source_type": "sponsored",
-      "location": "Your Home",
-      "recommended_action": "Get a free solar assessment at GoSolarSF.org. Lock in your 30% federal tax credit before it drops to 26% next year.",
-      "sponsored_by": "GoSolarSF Coalition"
     }
   ],
   "match_explanation": "Showing civic events matching your interests in AI policy, housing development, public safety, and startup-friendly policies in San Francisco."
