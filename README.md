@@ -1,155 +1,120 @@
-# Fulcrum.ai - Civic Engagement Platform
+# Compile Before the Ballot (Fulcrum.ai)
 
-> A Tinder for civic engagement—swipe through local policy decisions that actually affect your life, powered by AI.
+A civic engagement platform that matches San Francisco residents with the local policy decisions, hearings, and votes that actually affect their lives — built as a hackathon project.
 
 [![Built with FastAPI](https://img.shields.io/badge/Built%20with-FastAPI-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 
-## Overview
+## The Problem
 
-Fulcrum.ai matches San Francisco residents with civic events and policy decisions that directly affect their lives. Using AI-powered profile enrichment, the platform understands who you are and surfaces the opportunities that matter most to you.
+Most SF residents never hear about the parking changes, rent control hearings, school board votes, and transit proposals that directly impact them — until the decision has already been made. The information exists (Legistar publishes every Board of Supervisors meeting), but nobody has time to read committee agendas.
 
-## Features
+## What It Does
 
-- **AI-Powered Onboarding** - Enter your email, get a complete profile inferred via Nyne.ai
-- **Smart Matching** - Car owners see parking policies; renters see rent control hearings
-- **Swipeable Card UI** - Fast, engaging way to review civic opportunities
-- **Action Tracking** - Todo list with Google Calendar and email integration
-- **Real-Time Data** - Direct integration with SF government APIs (Legistar)
+1. **Smart onboarding** — Enter your email (and optionally a LinkedIn URL). Nyne.ai enrichment infers your profession, location, work history, social profiles, and likely interests.
+2. **Quick verification** — Review the inferred profile and answer a few targeted questions: Do you drive? Rent or own? Have kids? Use transit?
+3. **Personalized dashboard** — A swipeable card stack presents civic events matched to your profile, sorted by urgency (vote in 48h = Urgent), each with a concrete action: Vote YES/NO, Attend, Testify.
+4. **Action tracking** — Accepted cards land in a civic to-do list with Google Calendar links and EmailJS email reminders.
+
+### Smart Matching
+
+User attributes are converted into implicit interest tags, then matched against event `impact_tags`:
+
+| Attribute | Matched interests |
+|-----------|-------------------|
+| Has a car | parking, traffic |
+| No car | transportation, bike lanes |
+| Has kids | families, education, youth |
+
+Civic events are pulled live from the [SF Legistar API](https://webapi.legistar.com/v1/sfgov) (Board of Supervisors meetings and legislation), tagged by committee (e.g. Land Use → housing, zoning, transportation), and stored in Supabase.
 
 ## Tech Stack
 
-### Backend
-- Python 3.9+
-- FastAPI
-- Supabase (PostgreSQL)
-- Nyne.ai (profile enrichment)
-- Legistar API (civic data)
+**Backend** (`backend/`)
+- Python 3.9+ / FastAPI / Pydantic
+- Supabase (Postgres) for users and civic events
+- Nyne.ai — async profile enrichment (enrichment, interactions, and article-search endpoints, with a mock fallback when no API key is set)
+- Hyperspell — OAuth-connected memory search (token endpoint + search client)
+- OpenAI — LLM analysis of enriched profiles into civic-interest dossiers
+- httpx, pytest
 
-### Frontend
-- React 18 + TypeScript
-- Vite
-- Tailwind CSS + shadcn/ui
-- Framer Motion
-- TanStack Query
+**Frontend** (`frontend/`)
+- React 18 + TypeScript + Vite
+- Tailwind CSS + shadcn/ui (Radix primitives)
+- Framer Motion (card stack and scanning animations)
+- TanStack Query, React Router, EmailJS, Vitest
+- Ships fallback JSON data (`public/fallback-*.json`) so the demo runs even without the backend
 
 ## Getting Started
 
-### Prerequisites
-
-- Python 3.9+
-- Node.js 18+
-- Supabase account
-- Nyne.ai API key
-
-### Backend Setup
+### Backend
 
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+# From the repo root
+python -m venv venv && source venv/bin/activate
+pip install -r backend/requirements.txt
 
-# Create .env file
-cp .env.example .env
-# Add your API keys to .env
+cp backend/.env.example backend/.env   # add your keys
 
-uvicorn main:app --reload
+uvicorn backend.main:app --reload      # run from the repo root (package-relative imports)
 ```
 
-### Frontend Setup
+API docs at http://localhost:8000/docs.
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/onboard` | POST | Enrich a user profile from email/LinkedIn |
+| `/confirm-profile` | POST | Save the user-verified profile |
+| `/dashboard/{email}` | GET | Personalized civic events, sorted by urgency |
+| `/hyperspell/token` | POST | Token for the Hyperspell OAuth connect flow |
+| `/admin/refresh-events` | POST | Pull fresh events from Legistar into Supabase |
+| `/admin/events-stats` | GET | Event statistics |
+
+### Frontend
 
 ```bash
 cd frontend
 npm install
+cp .env.example .env    # set VITE_API_URL and (optionally) EmailJS keys
 npm run dev
 ```
 
-## API Endpoints
+### Environment Variables
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/onboard` | POST | Onboard user with AI profile enrichment |
-| `/confirm-profile` | POST | Save verified user profile |
-| `/dashboard/{email}` | GET | Get personalized civic events |
-| `/admin/refresh-events` | POST | Refresh civic data from sources |
-| `/admin/events-stats` | GET | Get event statistics |
+Backend (`backend/.env`): `SUPABASE_URL`, `SUPABASE_KEY`, `NYNE_API_KEY`, `NYNE_API_SECRET`, `HYPERSPELL_API_KEY`, `OPENAI_API_KEY`. Nyne and OpenAI are optional — the backend falls back to mock enrichment without them.
 
-## Environment Variables
-
-### Backend (.env)
-
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_anon_key
-NYNE_API_KEY=your_nyne_api_key
-OPENAI_API_KEY=your_openai_key  # Optional
-```
-
-### Frontend (.env)
-
-```
-VITE_API_URL=http://localhost:8000
-VITE_EMAILJS_SERVICE_ID=your_emailjs_service
-VITE_EMAILJS_TEMPLATE_ID=your_emailjs_template
-VITE_EMAILJS_PUBLIC_KEY=your_emailjs_key
-```
+Frontend (`frontend/.env`): `VITE_API_URL` (default `http://localhost:8000`), plus `VITE_EMAILJS_SERVICE_ID` / `VITE_EMAILJS_TEMPLATE_ID` / `VITE_EMAILJS_PUBLIC_KEY` for email reminders.
 
 ## Project Structure
 
 ```
 .
 ├── backend/
-│   ├── main.py              # FastAPI application
-│   ├── services/
-│   │   ├── nyne.py          # Nyne.ai integration
-│   │   ├── legistar.py      # Legistar API scraper
-│   │   └── supabase.py      # Database client
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # React components
-│   │   ├── pages/           # Page components
-│   │   ├── hooks/           # Custom hooks
-│   │   └── lib/             # Utilities
-│   └── package.json
-└── README.md
+│   ├── main.py                  # FastAPI app
+│   ├── models.py                # Pydantic models
+│   ├── routers/                 # onboard, profile, dashboard, hyperspell, admin
+│   └── services/
+│       ├── nyne.py              # Nyne.ai enrichment client (async, polling)
+│       ├── llm_enrichment.py    # OpenAI civic-profile analysis
+│       ├── hyperspell_client.py # Hyperspell memory search
+│       ├── supabase_client.py   # Database access
+│       └── scrapers/legistar.py # SF Legistar API scraper
+└── frontend/
+    └── src/
+        ├── pages/Index.tsx      # Landing → scanning → verification → dashboard flow
+        ├── components/          # landing, scanning, verification, dashboard, ui
+        └── lib/                 # API client, EmailJS helper
 ```
 
-## How It Works
+## Team
 
-1. **Onboarding** - User provides email/LinkedIn URL
-2. **Enrichment** - Nyne.ai infers 80+ profile fields (profession, location, interests)
-3. **Verification** - User confirms profile and answers follow-up questions
-4. **Matching** - Platform matches civic events based on user interests and attributes
-5. **Action** - User swipes through opportunities, adds to todo list, gets calendar/email reminders
-
-## Smart Matching
-
-User attributes are converted to implicit interests:
-
-| Attribute | Interests |
-|-----------|-----------|
-| Has car | Parking, traffic |
-| Rents | Rent control, tenant rights |
-| Has kids | Education, family services |
-| Uses transit | Transportation, SFMTA |
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
+- Het Sheth — [@het-sheth](https://github.com/het-sheth)
+- Ishaan Narang — [@Ishaannarang22](https://github.com/Ishaannarang22)
 
 ## Acknowledgments
 
-- [Nyne.ai](https://nyne.ai) for profile enrichment API
-- [SF Legistar](https://sfgov.legistar.com) for civic data
-- [shadcn/ui](https://ui.shadcn.com) for UI components
-
----
-
-Built with care for San Francisco civic engagement.
+- [Nyne.ai](https://nyne.ai) — profile enrichment
+- [Hyperspell](https://hyperspell.com) — context/memory agent
+- [SF Legistar](https://sfgov.legistar.com) — civic data
+- [shadcn/ui](https://ui.shadcn.com) — UI components
