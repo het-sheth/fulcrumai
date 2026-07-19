@@ -1,6 +1,6 @@
 # Compile Before the Ballot (Fulcrum.ai)
 
-A civic engagement platform that matches San Francisco residents with the local policy decisions, hearings, and votes that actually affect their lives — built as a hackathon project.
+A civic engagement platform that matches San Francisco residents with the local policy decisions, hearings, and votes that actually affect their lives. Built as a hackathon project.
 
 [![Built with FastAPI](https://img.shields.io/badge/Built%20with-FastAPI-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat&logo=react)](https://react.dev/)
@@ -8,14 +8,14 @@ A civic engagement platform that matches San Francisco residents with the local 
 
 ## The Problem
 
-Most SF residents never hear about the parking changes, rent control hearings, school board votes, and transit proposals that directly impact them — until the decision has already been made. The information exists (Legistar publishes every Board of Supervisors meeting), but nobody has time to read committee agendas.
+Most SF residents never hear about the parking changes, rent control hearings, school board votes, and transit proposals that directly impact them, until the decision has already been made. The information exists (Legistar publishes every Board of Supervisors meeting), but nobody has time to read committee agendas.
 
 ## What It Does
 
-1. **Smart onboarding** — Enter your email (and optionally a LinkedIn URL). Nyne.ai enrichment infers your profession, location, work history, social profiles, and likely interests.
-2. **Quick verification** — Review the inferred profile and answer a few targeted questions: Do you drive? Rent or own? Have kids? Use transit?
-3. **Personalized dashboard** — A swipeable card stack presents civic events matched to your profile, sorted by urgency (vote in 48h = Urgent), each with a concrete action: Vote YES/NO, Attend, Testify.
-4. **Action tracking** — Accepted cards land in a civic to-do list with Google Calendar links and EmailJS email reminders.
+1. **Smart onboarding**: Enter your email (and optionally a LinkedIn URL). Nyne.ai enrichment infers your profession, location, work history, social profiles, and likely interests.
+2. **Quick verification**: Review the inferred profile and answer a few targeted questions: Do you drive? Rent or own? Have kids? Use transit?
+3. **Personalized dashboard**: A swipeable card stack presents civic events matched to your profile, sorted by urgency (vote in 48h = Urgent), each with a concrete action: Vote YES/NO, Attend, Testify.
+4. **Action tracking**: Accepted cards land in a civic to-do list with Google Calendar links and EmailJS email reminders.
 
 ### Smart Matching
 
@@ -34,9 +34,9 @@ Civic events are pulled live from the [SF Legistar API](https://webapi.legistar.
 **Backend** (`backend/`)
 - Python 3.9+ / FastAPI / Pydantic
 - Supabase (Postgres) for users and civic events
-- Nyne.ai — async profile enrichment (enrichment, interactions, and article-search endpoints, with a mock fallback when no API key is set)
-- Hyperspell — OAuth-connected memory search (token endpoint + search client)
-- OpenAI — LLM analysis of enriched profiles into civic-interest dossiers
+- Nyne.ai: async profile enrichment (enrichment, interactions, and article-search endpoints, with a mock fallback when no API key is set)
+- Hyperspell: OAuth-connected memory search (token endpoint + search client)
+- OpenAI: LLM analysis of enriched profiles into civic-interest dossiers
 - httpx, pytest
 
 **Frontend** (`frontend/`)
@@ -82,7 +82,7 @@ npm run dev
 
 ### Environment Variables
 
-Backend (`backend/.env`): `SUPABASE_URL`, `SUPABASE_KEY`, `NYNE_API_KEY`, `NYNE_API_SECRET`, `HYPERSPELL_API_KEY`, `OPENAI_API_KEY`. Nyne and OpenAI are optional — the backend falls back to mock enrichment without them.
+Backend (`backend/.env`): `SUPABASE_URL`, `SUPABASE_KEY`, `NYNE_API_KEY`, `NYNE_API_SECRET`, `HYPERSPELL_API_KEY`, `OPENAI_API_KEY`. Nyne and OpenAI are optional: the backend falls back to mock enrichment without them.
 
 Frontend (`frontend/.env`): `VITE_API_URL` (default `http://localhost:8000`), plus `VITE_EMAILJS_SERVICE_ID` / `VITE_EMAILJS_TEMPLATE_ID` / `VITE_EMAILJS_PUBLIC_KEY` for email reminders.
 
@@ -109,12 +109,12 @@ Frontend (`frontend/.env`): `VITE_API_URL` (default `http://localhost:8000`), pl
 
 ## Team
 
-- Het Sheth — [@het-sheth](https://github.com/het-sheth)
-- Ishaan Narang — [@Ishaannarang22](https://github.com/Ishaannarang22)
+- Het Sheth: [@het-sheth](https://github.com/het-sheth)
+- Ishaan Narang: [@Ishaannarang22](https://github.com/Ishaannarang22)
 
 ## Acknowledgments
 
-- [Nyne.ai](https://nyne.ai) — profile enrichment
-- [Hyperspell](https://hyperspell.com) — context/memory agent
-- [SF Legistar](https://sfgov.legistar.com) — civic data
-- [shadcn/ui](https://ui.shadcn.com) — UI components
+- [Nyne.ai](https://nyne.ai): profile enrichment
+- [Hyperspell](https://hyperspell.com): context/memory agent
+- [SF Legistar](https://sfgov.legistar.com): civic data
+- [shadcn/ui](https://ui.shadcn.com): UI components
